@@ -1,0 +1,18 @@
+query GetCurrentUser {
+  getCurrentUser {
+    id
+    firstName
+    lastName
+    email
+    username
+    followers
+    following
+    profile {
+      id
+      bio
+      avatar
+      website
+      location
+    }
+  }
+}

@@ -1,0 +1,17 @@
+node_modules/
+bundle.js
+npm-debug.log
+
+/.idea
+/public
+
+.env
+.env.test
+.DS_Store
+
+build/
+dist/
+
+.eslintcache
+
+ormconfig.json

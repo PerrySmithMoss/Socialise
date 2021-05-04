@@ -1,0 +1,11 @@
+query getAllUsers {
+  getAllUsers {
+    id
+    firstName
+    lastName
+    username
+    email
+    followers
+    following
+  }
+}

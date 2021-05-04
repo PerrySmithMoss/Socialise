@@ -1,0 +1,17 @@
+query GetAllUserPosts {
+  getAllUserPosts {
+    postID
+    content
+    likes
+    datePublished
+    user {
+      id
+      firstName
+      lastName
+      email
+      username
+      followers
+      following
+    }
+  }
+}

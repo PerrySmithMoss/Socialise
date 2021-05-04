@@ -1,0 +1,5 @@
+mutation UploadUserImage($userId: Int!, $file: Upload!) {
+  uploadUserImage(userId: $userId, file: $file) {
+    url
+  }
+}

@@ -1,0 +1,15 @@
+mutation CreatePost(
+  $content: String!
+  $firstName: String!
+  $lastName: String!
+  $userName: String!
+  $datePublished: DateTime!
+) {
+  createPost(
+    content: $content
+    firstName: $firstName
+    lastName: $lastName
+    userName: $userName
+    datePublished: $datePublished
+  )
+}
