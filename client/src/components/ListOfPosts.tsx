@@ -8,7 +8,6 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import SwapVertIcon from "@material-ui/icons/SwapVert";
 import FavoriteIcon from "@material-ui/icons/Favorite";
-import ShareIcon from "@material-ui/icons/Share";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { Box, IconButton, Menu, MenuItem } from "@material-ui/core";
 import ModeCommentIcon from "@material-ui/icons/ModeComment";
@@ -20,9 +19,11 @@ import {
   GetAllPostsDocument,
   useDeletePostMutation,
   useGetAllPostsQuery,
+  useLikePostMutation
 } from "../generated/graphql";
 import moment from "moment";
 import { Link } from "react-router-dom";
+import { LikeButton } from "./LikeButton";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -44,6 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export const ListOfPosts: React.FC = () => {
   const classes = useStyles();
   const { data } = useGetAllPostsQuery({ fetchPolicy: "network-only" });
+  const [likePost] = useLikePostMutation();
   const [deletePost] = useDeletePostMutation();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -63,9 +65,10 @@ export const ListOfPosts: React.FC = () => {
       {data.getAllPosts.map((post: any) => (
         <List className={classes.list}>
           <ListItem
+          key={post.id}
           button
             component={Link}
-            to={{ pathname: `/post/${post.postID}` }}
+            to={{ pathname: `/post/${post.id}` }}
             alignItems="flex-start"
           >
             <ListItemAvatar>
@@ -101,12 +104,7 @@ export const ListOfPosts: React.FC = () => {
               </IconButton>
               <span>2</span>
             </Box>
-            <Box flexGrow={1}>
-              <IconButton aria-label="settings">
-                <FavoriteIcon fontSize="small" />
-              </IconButton>
-              <span>12</span>
-            </Box>
+            <LikeButton post={post} />
             <Box flexGrow={1}>
             <IconButton
               aria-label="settings"

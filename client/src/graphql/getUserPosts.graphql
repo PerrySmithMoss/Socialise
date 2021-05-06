@@ -1,8 +1,9 @@
 query GetAllUserPosts {
   getAllUserPosts {
-    postID
+    id
     content
-    likes
+    points
+    voteStatus
     datePublished
     user {
       id

@@ -1,5 +1,4 @@
-query GetAllPosts{
-  getAllPosts{
+fragment PostSnippet on Post {
     id
     userId
     firstName
@@ -7,10 +6,9 @@ query GetAllPosts{
     content
     voteStatus
     likes {
-      userId
+        userId
     }
     datePublished
     userName
     points
-  }
 }

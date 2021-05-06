@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import { Post } from "./Post";
 import { Profile } from "./Profile";
+import { LikedPost } from "./LikedPost";
 
 @ObjectType()
 @Entity("users")
@@ -59,6 +60,9 @@ export class Users extends BaseEntity {
   })
   @Field(() => [Post])
   posts: Post[];
+
+  @OneToMany(() => LikedPost, (like) => like.user)
+  likes: LikedPost[];
 
   @OneToOne(() => Profile, {
     cascade: true,

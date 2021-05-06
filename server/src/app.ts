@@ -14,6 +14,7 @@ import { Post } from "./Entities/Post";
 import { PostResolver } from "./Schema/Resolvers/PostResolver";
 import { Profile } from "./Entities/Profile";
 import { graphqlUploadExpress } from "graphql-upload";
+import { LikedPost } from "./Entities/LikedPost";
 
 const main = async () => {
   const app: Application = express();
@@ -37,7 +38,7 @@ const main = async () => {
     password: `${process.env.PASSWORD}`,
     logging: true,
     synchronize: false,
-    entities: [Users, Post, Profile],
+    entities: [Users, Post, Profile, LikedPost],
   });
 
   app.post("/refresh_token", async (req: Request, res: Response) => {

@@ -24,6 +24,13 @@ export type ImageUploadResponse = {
   url: Scalars['String'];
 };
 
+export type LikedPost = {
+  __typename?: 'LikedPost';
+  userId: Scalars['Int'];
+  user: Users;
+  postId: Scalars['Int'];
+};
+
 export type LoginResponse = {
   __typename?: 'LoginResponse';
   accessToken: Scalars['String'];
@@ -41,6 +48,7 @@ export type Mutation = {
   registerUser: Scalars['Boolean'];
   createPost: Scalars['Boolean'];
   deletePost: Scalars['Boolean'];
+  likePost: Scalars['Boolean'];
 };
 
 
@@ -94,16 +102,24 @@ export type MutationDeletePostArgs = {
   postID: Scalars['Int'];
 };
 
+
+export type MutationLikePostArgs = {
+  value: Scalars['Int'];
+  postId: Scalars['Int'];
+};
+
 export type Post = {
   __typename?: 'Post';
-  postID: Scalars['Int'];
+  id: Scalars['Int'];
   userId: Scalars['Int'];
   userName: Scalars['String'];
   firstName: Scalars['String'];
   lastName: Scalars['String'];
   content: Scalars['String'];
   datePublished: Scalars['DateTime'];
-  likes: Scalars['Int'];
+  points: Scalars['Float'];
+  voteStatus?: Maybe<Scalars['Int']>;
+  likes: Array<LikedPost>;
   user: Users;
 };
 
@@ -150,6 +166,15 @@ export type Users = {
   posts: Array<Post>;
   profile: Profile;
 };
+
+export type PostSnippetFragment = (
+  { __typename?: 'Post' }
+  & Pick<Post, 'id' | 'userId' | 'firstName' | 'lastName' | 'content' | 'voteStatus' | 'datePublished' | 'userName' | 'points'>
+  & { likes: Array<(
+    { __typename?: 'LikedPost' }
+    & Pick<LikedPost, 'userId'>
+  )> }
+);
 
 export type ByeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -200,7 +225,11 @@ export type GetAllPostsQuery = (
   { __typename?: 'Query' }
   & { getAllPosts: Array<(
     { __typename?: 'Post' }
-    & Pick<Post, 'postID' | 'userId' | 'firstName' | 'lastName' | 'content' | 'datePublished' | 'userName' | 'likes'>
+    & Pick<Post, 'id' | 'userId' | 'firstName' | 'lastName' | 'content' | 'voteStatus' | 'datePublished' | 'userName' | 'points'>
+    & { likes: Array<(
+      { __typename?: 'LikedPost' }
+      & Pick<LikedPost, 'userId'>
+    )> }
   )> }
 );
 
@@ -237,7 +266,7 @@ export type GetAllUserPostsQuery = (
   { __typename?: 'Query' }
   & { getAllUserPosts: Array<(
     { __typename?: 'Post' }
-    & Pick<Post, 'postID' | 'content' | 'likes' | 'datePublished'>
+    & Pick<Post, 'id' | 'content' | 'points' | 'voteStatus' | 'datePublished'>
     & { user: (
       { __typename?: 'Users' }
       & Pick<Users, 'id' | 'firstName' | 'lastName' | 'email' | 'username' | 'followers' | 'following'>
@@ -251,6 +280,17 @@ export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
 export type HelloQuery = (
   { __typename?: 'Query' }
   & Pick<Query, 'hello'>
+);
+
+export type LikePostMutationVariables = Exact<{
+  value: Scalars['Int'];
+  postId: Scalars['Int'];
+}>;
+
+
+export type LikePostMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'likePost'>
 );
 
 export type LogUserOutMutationVariables = Exact<{ [key: string]: never; }>;
@@ -318,7 +358,22 @@ export type UploadUserImageMutation = (
   ) }
 );
 
-
+export const PostSnippetFragmentDoc = gql`
+    fragment PostSnippet on Post {
+  id
+  userId
+  firstName
+  lastName
+  content
+  voteStatus
+  likes {
+    userId
+  }
+  datePublished
+  userName
+  points
+}
+    `;
 export const ByeDocument = gql`
     query Bye {
   bye
@@ -457,14 +512,18 @@ export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMut
 export const GetAllPostsDocument = gql`
     query GetAllPosts {
   getAllPosts {
-    postID
+    id
     userId
     firstName
     lastName
     content
+    voteStatus
+    likes {
+      userId
+    }
     datePublished
     userName
-    likes
+    points
   }
 }
     `;
@@ -585,9 +644,10 @@ export type GetCurrentUserQueryResult = Apollo.QueryResult<GetCurrentUserQuery, 
 export const GetAllUserPostsDocument = gql`
     query GetAllUserPosts {
   getAllUserPosts {
-    postID
+    id
     content
-    likes
+    points
+    voteStatus
     datePublished
     user {
       id
@@ -660,6 +720,38 @@ export function useHelloLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Hell
 export type HelloQueryHookResult = ReturnType<typeof useHelloQuery>;
 export type HelloLazyQueryHookResult = ReturnType<typeof useHelloLazyQuery>;
 export type HelloQueryResult = Apollo.QueryResult<HelloQuery, HelloQueryVariables>;
+export const LikePostDocument = gql`
+    mutation LikePost($value: Int!, $postId: Int!) {
+  likePost(value: $value, postId: $postId)
+}
+    `;
+export type LikePostMutationFn = Apollo.MutationFunction<LikePostMutation, LikePostMutationVariables>;
+
+/**
+ * __useLikePostMutation__
+ *
+ * To run a mutation, you first call `useLikePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLikePostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [likePostMutation, { data, loading, error }] = useLikePostMutation({
+ *   variables: {
+ *      value: // value for 'value'
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useLikePostMutation(baseOptions?: Apollo.MutationHookOptions<LikePostMutation, LikePostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LikePostMutation, LikePostMutationVariables>(LikePostDocument, options);
+      }
+export type LikePostMutationHookResult = ReturnType<typeof useLikePostMutation>;
+export type LikePostMutationResult = Apollo.MutationResult<LikePostMutation>;
+export type LikePostMutationOptions = Apollo.BaseMutationOptions<LikePostMutation, LikePostMutationVariables>;
 export const LogUserOutDocument = gql`
     mutation LogUserOut {
   logUserOut

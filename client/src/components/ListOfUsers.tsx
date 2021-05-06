@@ -36,6 +36,7 @@ export const ListOfUsers: React.FC = () => {
   return (
       <List dense className={classes.root}>
         {data.getAllUsers.map((user: any) => (
+          <div key={user.id}>
           <ListItem key={user.id} button>
             <ListItemAvatar>
               <Avatar />
@@ -59,6 +60,7 @@ export const ListOfUsers: React.FC = () => {
               </Button>
             </ListItemSecondaryAction>
           </ListItem>
+          </div>
         ))}
       </List>
   );

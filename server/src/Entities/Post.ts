@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from "type-graphql";
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { LikedPost } from "./LikedPost";
 import { Users } from "./Users";
 
 @ObjectType()
@@ -7,7 +8,7 @@ import { Users } from "./Users";
 export class Post extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
-  postID!: number;
+  id!: number;
 
   @Field(() => Int)
   @Column()
@@ -33,9 +34,18 @@ export class Post extends BaseEntity {
   @Column()
   datePublished!: Date;
 
-  @Field(() => Int)
-  @Column("int", { default: 0 })
-  likes!: number;
+  @Field()
+  @Column({ type: "int", default: 0 })
+  points!: number;
+
+  @Field(() => Int, { nullable: true })
+  voteStatus: number | null; // 1 or -1 or null
+
+  @OneToMany(() => LikedPost, (like) => like.post, {
+    cascade: true
+  })
+  @Field(() => [LikedPost])
+  likes: LikedPost[];
 
   @ManyToOne(() => Users, user => user.posts, {
     onDelete: 'CASCADE',
