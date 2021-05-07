@@ -29,8 +29,6 @@ export class PostResolver {
         datePublished: "DESC",
       },
     });
-
-    console.log(posts)
     return posts
   }
 

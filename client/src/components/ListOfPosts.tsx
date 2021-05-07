@@ -33,7 +33,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     list: {
       width: 500,
-
       backgroundColor: theme.palette.background.paper,
     },
     inline: {
@@ -68,7 +67,7 @@ export const ListOfPosts: React.FC = () => {
           key={post.id}
           button
             component={Link}
-            to={{ pathname: `/post/${post.id}` }}
+            to={{ pathname: `/post/${post.id}`, state: {post} }}
             alignItems="flex-start"
           >
             <ListItemAvatar>
