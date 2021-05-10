@@ -21,6 +21,7 @@ export type Scalars = {
 export type Comment = {
   __typename?: 'Comment';
   comment: Scalars['String'];
+  datePublished: Scalars['DateTime'];
   userId: Scalars['Int'];
   user: Users;
   postId: Scalars['Int'];
@@ -119,6 +120,7 @@ export type MutationLikePostArgs = {
 
 
 export type MutationCommentOnPostArgs = {
+  datePublished: Scalars['DateTime'];
   comment: Scalars['String'];
   postId: Scalars['Int'];
 };
@@ -204,6 +206,7 @@ export type ByeQuery = (
 export type CommentOnPostMutationVariables = Exact<{
   postId: Scalars['Int'];
   comment: Scalars['String'];
+  datePublished: Scalars['DateTime'];
 }>;
 
 
@@ -260,6 +263,14 @@ export type GetAllPostsQuery = (
     )>, comments: Array<(
       { __typename?: 'Comment' }
       & Pick<Comment, 'comment'>
+      & { user: (
+        { __typename?: 'Users' }
+        & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username'>
+        & { profile: (
+          { __typename?: 'Profile' }
+          & Pick<Profile, 'avatar'>
+        ) }
+      ) }
     )>, user: (
       { __typename?: 'Users' }
       & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username' | 'email'>
@@ -445,8 +456,8 @@ export type ByeQueryHookResult = ReturnType<typeof useByeQuery>;
 export type ByeLazyQueryHookResult = ReturnType<typeof useByeLazyQuery>;
 export type ByeQueryResult = Apollo.QueryResult<ByeQuery, ByeQueryVariables>;
 export const CommentOnPostDocument = gql`
-    mutation CommentOnPost($postId: Int!, $comment: String!) {
-  commentOnPost(postId: $postId, comment: $comment)
+    mutation CommentOnPost($postId: Int!, $comment: String!, $datePublished: DateTime!) {
+  commentOnPost(postId: $postId, comment: $comment, datePublished: $datePublished)
 }
     `;
 export type CommentOnPostMutationFn = Apollo.MutationFunction<CommentOnPostMutation, CommentOnPostMutationVariables>;
@@ -466,6 +477,7 @@ export type CommentOnPostMutationFn = Apollo.MutationFunction<CommentOnPostMutat
  *   variables: {
  *      postId: // value for 'postId'
  *      comment: // value for 'comment'
+ *      datePublished: // value for 'datePublished'
  *   },
  * });
  */
@@ -593,6 +605,15 @@ export const GetAllPostsDocument = gql`
     }
     comments {
       comment
+      user {
+        id
+        firstName
+        lastName
+        username
+        profile {
+          avatar
+        }
+      }
     }
     user {
       id

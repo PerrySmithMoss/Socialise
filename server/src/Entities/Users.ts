@@ -11,6 +11,7 @@ import {
 import { Post } from "./Post";
 import { Profile } from "./Profile";
 import { LikedPost } from "./LikedPost";
+import { Comment } from "./Comment"
 
 @ObjectType()
 @Entity("users")
@@ -63,6 +64,9 @@ export class Users extends BaseEntity {
 
   @OneToMany(() => LikedPost, (like) => like.user)
   likes: LikedPost[];
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
 
   @OneToOne(() => Profile, {
     cascade: true,

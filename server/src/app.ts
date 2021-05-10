@@ -15,6 +15,7 @@ import { PostResolver } from "./Schema/Resolvers/PostResolver";
 import { Profile } from "./Entities/Profile";
 import { graphqlUploadExpress } from "graphql-upload";
 import { LikedPost } from "./Entities/LikedPost";
+import { Comment } from "./Entities/Comment";
 
 const main = async () => {
   const app: Application = express();
@@ -37,8 +38,8 @@ const main = async () => {
     username: `${process.env.USERNAME}`,
     password: `${process.env.PASSWORD}`,
     logging: true,
-    synchronize: false,
-    entities: [Users, Post, Profile, LikedPost],
+    synchronize: true,
+    entities: [Users, Post, Profile, LikedPost, Comment],
   });
 
   app.post("/refresh_token", async (req: Request, res: Response) => {

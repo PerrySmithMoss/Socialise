@@ -1,6 +1,7 @@
 import { Field, Int, ObjectType } from "type-graphql";
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { LikedPost } from "./LikedPost";
+import { Comment } from "./Comment"
 import { Users } from "./Users";
 
 @ObjectType()
@@ -38,6 +39,10 @@ export class Post extends BaseEntity {
   @Column({ type: "int", default: 0 })
   points!: number;
 
+  @Field()
+  @Column({ type: "int", default: 0 })
+  commentsCount!: number;
+
   @Field(() => Int, { nullable: true })
   voteStatus: number | null; // 1 or -1 or null
 
@@ -46,6 +51,12 @@ export class Post extends BaseEntity {
   })
   @Field(() => [LikedPost])
   likes: LikedPost[];
+
+  @OneToMany(() => Comment, (comment) => comment.post, {
+    cascade: true
+  })
+  @Field(() => [Comment])
+  comments: [Comment];
 
   @ManyToOne(() => Users, user => user.posts, {
     onDelete: 'CASCADE',

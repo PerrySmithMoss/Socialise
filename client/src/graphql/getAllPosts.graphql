@@ -11,6 +11,15 @@ query GetAllPosts{
     }
     comments {
       comment
+      user{
+        id
+        firstName
+        lastName
+        username
+        profile {
+          avatar
+        }
+      }
     }
     user {
       id

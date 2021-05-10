@@ -1,9 +1,11 @@
 mutation CommentOnPost(
   $postId: Int!
   $comment: String!
+  $datePublished: DateTime!
 ) {
   commentOnPost(
     postId: $postId
     comment: $comment
+    datePublished: $datePublished
   )
 }

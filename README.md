@@ -11,6 +11,7 @@
   <li>Login / Registration / Logout</li>
   <li>JWT authentication</li>
   <li>Ability for users to CRUD posts</li>
+  <li>Like / Unlike posts</li>
   <li>Following / Followers capability </li>
   <li>Ability for users to update their profile</li>
 </ul>

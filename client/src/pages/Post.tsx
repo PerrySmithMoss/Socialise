@@ -102,7 +102,7 @@ export const Post: React.FC<Props> = ({ location }) => {
             alignItems="flex-start"
           >
             <ListItemAvatar>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+              <Avatar alt="Remy Sharp" src={location.state.post.user.profile.avatar} />
             </ListItemAvatar>
             <ListItemText style={{textDecoration: "none"}}
               primary={
@@ -126,7 +126,7 @@ export const Post: React.FC<Props> = ({ location }) => {
               <IconButton aria-label="settings">
                 <ModeCommentIcon fontSize="small" />
               </IconButton>
-              <span>3</span>
+              <span>{location.state.post.commentsCount}</span>
             </Box>
             <Box flexGrow={1}>
               <IconButton aria-label="settings">
@@ -174,7 +174,95 @@ export const Post: React.FC<Props> = ({ location }) => {
             </Box>
           </Box>
           <Divider variant="inset" component="li" />
-          <h2 > Comments component goes here</h2>
+          <br></br>
+          {location.state.post.comments && location.state.post.comments.map(
+            (comment: any) => (
+              <div>
+              <ListItem
+              key={location.state.post.id}
+              button
+                // component={Link}
+                // to={{ pathname: `/post/${location.state.post.id}` }}
+                alignItems="flex-start"
+              >
+                <ListItemAvatar>
+                  <Avatar alt="Remy Sharp" src={comment.user.profile.avatar} />
+                </ListItemAvatar>
+                <ListItemText style={{textDecoration: "none"}}
+                  primary={
+                    <Typography variant="h6" style={{ fontSize: "16px", color: 'white' }}>{`${comment.user.firstName}${comment.user.lastName} @${
+                    comment.user.username
+                    } 
+                  - ${moment(comment.datePublished).fromNow()}`}</Typography>
+                  }
+                  secondary={<React.Fragment>{`${comment.comment}`}</React.Fragment>}
+                />
+      
+              </ListItem>
+              {/* <Box
+                display="flex"
+                justifyContent="space-between"
+                textAlign="center"
+                p={1}
+                bgcolor="background.paper"
+              >
+                <Box flexGrow={1}>
+                  <IconButton aria-label="settings">
+                    <ModeCommentIcon fontSize="small" />
+                  </IconButton>
+                  <span>{location.state.post.commentsCount}</span>
+                </Box>
+                <Box flexGrow={1}>
+                  <IconButton aria-label="settings">
+                    <SwapVertIcon />
+                  </IconButton>
+                  <span>2</span>
+                </Box>
+                <LikeButton post={location.state.post} />
+                <Box flexGrow={1}>
+                <IconButton
+                  aria-label="settings"
+                  aria-controls="simple-menu"
+                  aria-haspopup="true"
+                  onClick={handleClick}
+                >
+                  <MoreVertIcon />
+                </IconButton>
+                <Menu
+                  id="simple-menu"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                >
+                  <MenuItem
+                    style={{ color: "red" }}
+                    // onClick={async () => {
+                    //   await deletePost({
+                    //     variables: { postID: post.postID },
+                    //     refetchQueries: [{ query: GetAllPostsDocument }],
+                    //   });
+                    // }}
+                  >
+                    Delete post <DeleteIcon />
+                  </MenuItem>
+                  <Divider></Divider>
+                  <MenuItem onClick={handleClose}>
+                    Pin to your timeline <PersonPinCircleIcon />
+                  </MenuItem>
+                  <Divider></Divider>
+                  <MenuItem onClick={handleClose}>
+                    Add/remove from your list <ListIcon />
+                  </MenuItem>
+                </Menu>
+                </Box>
+              </Box> */}
+              <br></br>
+          <Divider variant="inset" component="li" />
+
+              </div>
+            )
+          )}
         </List>
           </Grid>
 

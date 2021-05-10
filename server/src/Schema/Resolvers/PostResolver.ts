@@ -19,16 +19,18 @@ import { LikedPost } from "../../Entities/LikedPost";
 import { Post } from "../../Entities/Post";
 import { Users } from "../../Entities/Users";
 import { MyContext } from "../../Types/MyContext";
+import { Comment } from "../../Entities/Comment"
 
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
   async getAllPosts() {
-    const posts = await Post.find({relations: ['likes'],
+    const posts = await Post.find({relations: ['likes', 'user', 'user.profile', 'comments', 'comments.user', 'comments.user.profile'],
       order: {
         datePublished: "DESC",
       },
     });
+    // console.log(posts)
     return posts
   }
 
@@ -167,21 +169,66 @@ export class PostResolver {
           );
         });
       }
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+    return true;
+  }
 
-      // await getConnection().query(
-      //   `
-      //   START TRANSACTION
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async commentOnPost(
+    @Arg("postId", () => Int) postId: number,
+    @Arg("comment", () => String) comment: string,
+    @Arg("datePublished") datePublished: Date,
+    @Ctx() context: MyContext
+  ) {
+    const authorization = context.req.headers["authorization"];
+    console.log(authorization);
 
-      //   INSERT INTO liked_posts (userId, postId, value)
-      //   VALUES (${17}, ${postId}, ${realValue});
+    try {
+      const token = authorization!.split(" ")[1];
+      const payload: any = verify(token, process.env.ACCESS_KEY!);
+      const userId = payload.userId;
+      console.log("Your user id is:" + payload.userId);
 
-      //   UPDATE posts
-      //   SET points = points + ${realValue}
-      //   WHERE id = ${postId};
+    //   await getConnection().transaction(async (trns) => {
+    //       await trns.query(
+    //         `
+    //         INSERT INTO comments (userId, postId, comment)
+    //         VALUES (${userId}, ${postId}, ${comment});
+    //         `
+    //       );
+    //       await trns.query(
+    //         `
+    //         UPDATE posts 
+    //         SET commentsCount = commentsCount + 1
+    //         WHERE id = ${postId};
+    //         `
+    //       );
+    // });
 
-      //   COMMIT
-      //   `
-      // )
+        // const post = await Post.findOne({
+        //   where: { postId },
+        // });
+        // await Post.update({id: postId}, commen)
+
+        await Comment.insert({
+          userId: userId,
+          postId: postId,
+          comment: comment,
+          datePublished: datePublished
+        });
+
+        await getConnection().query(
+          `
+          UPDATE posts 
+          SET commentsCount = commentsCount + 1
+          WHERE id = ${postId};
+          `
+        )
+    
     } catch (err) {
       console.log(err);
       return false;

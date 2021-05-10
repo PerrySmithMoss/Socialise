@@ -23,6 +23,7 @@ import { Typography } from "@material-ui/core";
 import {
   useGetCurrentUserQuery,
   useCommentOnPostMutation,
+  GetAllPostsDocument,
 } from "../../generated/graphql";
 import moment from "moment";
 import { Link } from "react-router-dom";
@@ -75,7 +76,9 @@ export const CommentModal: React.FC<Props> = ({
   });
   const [commentOnPost] = useCommentOnPostMutation();
   const [comment, setComment] = useState("");
-
+  const [datePublished, setDatePublished] = useState(
+    moment().format("YYYY-MM-DD hh:mm:ss").toString()
+  );
   const handleCommentOnPost = async (postId: number) => {
     if (comment.length === 0 || !comment.trim()) {
       // setOpen(true);
@@ -85,8 +88,9 @@ export const CommentModal: React.FC<Props> = ({
         variables: {
           postId: postId,
           comment: comment,
+          datePublished: datePublished,
         },
-        // refetchQueries: [{ query: GetAllPostsDocument }],
+        refetchQueries: [{ query: GetAllPostsDocument }],
       });
       setComment("");
     }
