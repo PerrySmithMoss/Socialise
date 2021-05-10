@@ -9,8 +9,23 @@ query GetAllPosts{
     likes {
       userId
     }
+    comments {
+      comment
+    }
+    user {
+      id
+      firstName
+      lastName
+      username
+      email
+      profile {
+        id
+        avatar
+      }
+    }
     datePublished
     userName
     points
+    commentsCount
   }
 }

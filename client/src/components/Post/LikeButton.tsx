@@ -7,8 +7,8 @@ import {
   GetCurrentUserDocument,
   PostSnippetFragment,
   useGetCurrentUserQuery,
-} from "../generated/graphql";
-import { useLikePostMutation } from "../generated/graphql";
+} from "../../generated/graphql";
+import { useLikePostMutation } from "../../generated/graphql";
 import gql from "graphql-tag";
 
 interface Props {

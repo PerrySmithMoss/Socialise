@@ -49,8 +49,9 @@ export const WhatsHappening: React.FC = () => {
   const { data: User, loading } = useGetCurrentUserQuery({
     fetchPolicy: "cache-first",
   });
-  if (Posts) {
+  if (Posts && User) {
     console.log(Posts);
+    console.log(User);
   }
   const [content, setContent] = useState("");
   const [datePublished, setDatePublished] = useState(
@@ -61,7 +62,6 @@ export const WhatsHappening: React.FC = () => {
     if (content.length === 0 || !content.trim()) {
       setOpen(true);
     } else {
-      setContent("");
       await createPost({
         variables: {
           datePublished: datePublished,
@@ -72,6 +72,7 @@ export const WhatsHappening: React.FC = () => {
         },
         refetchQueries: [{ query: GetAllPostsDocument }],
       });
+      setContent("");
     }
   };
 
@@ -100,7 +101,7 @@ export const WhatsHappening: React.FC = () => {
         <Avatar
           className={classes.avatar}
           alt="Remy Sharp"
-          src="/static/images/avatar/1.jpg"
+          src={User?.getCurrentUser?.profile.avatar as string}
         />
         <TextField
           value={content}

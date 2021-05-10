@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -7,7 +7,6 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import SwapVertIcon from "@material-ui/icons/SwapVert";
-import FavoriteIcon from "@material-ui/icons/Favorite";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { Box, IconButton, Menu, MenuItem } from "@material-ui/core";
 import ModeCommentIcon from "@material-ui/icons/ModeComment";
@@ -23,7 +22,8 @@ import {
 } from "../generated/graphql";
 import moment from "moment";
 import { Link } from "react-router-dom";
-import { LikeButton } from "./LikeButton";
+import { LikeButton } from "./Post/LikeButton";
+import { CommentModal } from "./Post/CommentModal";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,6 +47,20 @@ export const ListOfPosts: React.FC = () => {
   const [likePost] = useLikePostMutation();
   const [deletePost] = useDeletePostMutation();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [openCommentDialog, setOpenCommentDialog] = React.useState(false);
+  const [singlePost, setSinglePost] = useState({
+    id: undefined,
+    firstName: "",
+    lastName: "",
+    userName: "",
+    datePublished: "",
+    content: "",
+    user: {
+      profile: {
+        avatar: ""
+      }
+    }
+  });
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -58,6 +72,17 @@ export const ListOfPosts: React.FC = () => {
   if (!data) {
     return <div>Loading...</div>;
   }
+
+  const handleCommentClickOpen = (post: any) => {
+    // console.log(post)
+    setSinglePost(post)
+    setOpenCommentDialog(true);
+  };
+
+  const handleCommentClickClose = () => {
+    setOpenCommentDialog(false);
+  };
+
 
   return (
     <div>
@@ -71,7 +96,7 @@ export const ListOfPosts: React.FC = () => {
             alignItems="flex-start"
           >
             <ListItemAvatar>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+              <Avatar alt="Remy Sharp" src={post.user.profile.avatar} />
             </ListItemAvatar>
             <ListItemText style={{textDecoration: "none"}}
               primary={
@@ -92,11 +117,12 @@ export const ListOfPosts: React.FC = () => {
             bgcolor="background.paper"
           >
             <Box flexGrow={1}>
-              <IconButton aria-label="settings">
+              <IconButton onClick={() => handleCommentClickOpen(post)}  aria-label="settings">
                 <ModeCommentIcon fontSize="small" />
               </IconButton>
-              <span>3</span>
+              <span>{`${post.commentsCount}`}</span>
             </Box>
+            <CommentModal post={singlePost} openCommentDialog={openCommentDialog} handleCommentClickClose={handleCommentClickClose}/>
             <Box flexGrow={1}>
               <IconButton aria-label="settings">
                 <SwapVertIcon />

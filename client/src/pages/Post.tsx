@@ -20,7 +20,7 @@ import PersonPinCircleIcon from "@material-ui/icons/PersonPinCircle";
 import ListIcon from "@material-ui/icons/List";
 import moment from "moment";
 import { Link } from "react-router-dom";
-import { LikeButton } from "../components/LikeButton";
+import { LikeButton } from "../components/Post/LikeButton";
 import { useDeletePostMutation } from "../generated/graphql";
 import {useLocation} from "react-router-dom";
 import TimelineIcon from '@material-ui/icons/Timeline';
