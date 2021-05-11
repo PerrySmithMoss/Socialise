@@ -14,6 +14,9 @@ const useStyles = makeStyles((theme: Theme) =>
         // marginLeft: 10,
         width: "100%",
       },
+      textField: {
+        borderRadius: "40px"
+      }
   })
 );
 
@@ -21,7 +24,7 @@ export const SearchBar: React.FC = () => {
     const classes = useStyles();
     return (
     <div className={classes.root}>
-        <Box display="flex"  bgcolor="background.paper">
+        <Box mb={2} mt={2} display="flex"  bgcolor="background.paper">
         <TextField
         //   value={content}
         //   onChange={(event) => {
@@ -32,13 +35,11 @@ export const SearchBar: React.FC = () => {
           variant="outlined"
           size="small"
           label="Search Socialise"
-        //   InputProps={{
-        //     startAdornment: (
-        //       <InputAdornment position="start">
-        //         <SearchIcon />
-        //       </InputAdornment>
-        //     ),
-        //   }}
+          // InputProps={{
+          //   classes: {
+          //     root: classes.textField
+          //   }
+          // }}
         />
       </Box>
       </div>

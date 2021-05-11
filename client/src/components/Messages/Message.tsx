@@ -13,7 +13,7 @@ import { Box, Divider } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
 import AddCommentIcon from "@material-ui/icons/AddComment";
-import InfoIcon from '@material-ui/icons/Info';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 
 interface Props {}
 
@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     test: {
       width: 400,
+      height: 75
     },
     list: {
 
@@ -45,10 +46,11 @@ export const Message: React.FC<Props> = () => {
   return (
     <Grid item className={classes.grid}>
       <div className={classes.test}>
-        <Box width={400} display="flex" pl={2} bgcolor="background.paper">
+        <Box width={460} height={75} display="flex" pl={2} bgcolor="background.paper">
           <Box flexGrow={1}>
             <List className={classes.list}>
               <ListItem
+              style={{ paddingTop: 0, paddingBottom: 0, paddingLeft: 0}}
                 //   key={post.id}
                 alignItems="flex-start"
               >
@@ -73,13 +75,16 @@ export const Message: React.FC<Props> = () => {
 
           <Box mt={1}>
             <IconButton style={{ color: "#14ffec" }} aria-label="delete">
-              <InfoIcon  />
+              <InfoOutlinedIcon  />
             </IconButton>
           </Box>
         </Box>
+        <Divider />
 
-
-        {/* <MessagesList /> */}
+        <Box width={460} height={500} display="flex" pl={2} bgcolor="background.paper">
+          <Box flexGrow={1}>
+        </Box>
+        </Box>
       </div>
     </Grid>
   );

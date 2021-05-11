@@ -18,6 +18,7 @@ import {
   GetAllPostsDocument,
   useDeletePostMutation,
   useGetAllPostsQuery,
+  useGetCurrentUserQuery,
   useLikePostMutation
 } from "../generated/graphql";
 import moment from "moment";
@@ -44,6 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export const ListOfPosts: React.FC = () => {
   const classes = useStyles();
   const { data } = useGetAllPostsQuery({ fetchPolicy: "network-only" });
+  const { data: currentUser, loading } = useGetCurrentUserQuery({ fetchPolicy: "cache-first" });
   const [likePost] = useLikePostMutation();
   const [deletePost] = useDeletePostMutation();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -129,7 +131,7 @@ export const ListOfPosts: React.FC = () => {
               </IconButton>
               <span>2</span>
             </Box>
-            <LikeButton post={post} />
+            <LikeButton currentUser={currentUser} post={post} />
             <Box flexGrow={1}>
             <IconButton
               aria-label="settings"

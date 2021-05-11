@@ -21,7 +21,7 @@ import ListIcon from "@material-ui/icons/List";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import { LikeButton } from "../components/Post/LikeButton";
-import { useDeletePostMutation } from "../generated/graphql";
+import { useDeletePostMutation, useGetCurrentUserQuery } from "../generated/graphql";
 import {useLocation} from "react-router-dom";
 import TimelineIcon from '@material-ui/icons/Timeline';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -55,6 +55,7 @@ export const Post: React.FC<Props> = ({ location }) => {
   const classes = useStyles();
   let { state } = useLocation();
   const history = useHistory();
+  const { data: currentUser, loading } = useGetCurrentUserQuery({ fetchPolicy: "cache-first" });
   const [deletePost] = useDeletePostMutation();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -134,7 +135,7 @@ export const Post: React.FC<Props> = ({ location }) => {
               </IconButton>
               <span>2</span>
             </Box>
-            <LikeButton post={location.state.post} />
+            <LikeButton currentUser={currentUser} post={location.state.post} />
             <Box flexGrow={1}>
             <IconButton
               aria-label="settings"

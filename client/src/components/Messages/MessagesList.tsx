@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import Grid, { GridSpacing } from "@material-ui/core/Grid";
 import { SearchBar } from "../../components//Messages/SearchBar";
 import { LeftNav } from "../../components/Home/LeftNav";
-
+import { useGetAllUserMessagesQuery } from "../../generated/graphql";
 import { Box, Divider } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: "100%",
-      maxWidth: 300,
+      maxWidth: 305,
       backgroundColor: theme.palette.background.paper,
     },
     inline: {
@@ -35,17 +35,19 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: 25,
     },
     test: {
-      width: 400,
+      width: 305,
     },
   })
 );
 
 export const MessagesList: React.FC<Props> = () => {
   const classes = useStyles();
+  const { data } = useGetAllUserMessagesQuery({ fetchPolicy: "network-only" });
+  console.log(data)
   return (
     <Grid item className={classes.grid}>
       <div className={classes.test}>
-        <Box width={300} display="flex" pl={2} bgcolor="background.paper">
+        <Box width={305} display="flex" pl={2} bgcolor="background.paper">
           <Box flexGrow={1}>
             <h2>Messages</h2>
           </Box>
@@ -59,8 +61,14 @@ export const MessagesList: React.FC<Props> = () => {
             </IconButton>
           </Box>
         </Box>
-        <SearchBar />
 
+        <Divider />
+        <Box display="flex" pb={1} bgcolor="background.paper"></Box>
+        <SearchBar />
+        <Box display="flex" pt={1} bgcolor="background.paper"></Box>
+        <Divider />
+
+        {data?.getAllUserMessages.map((message: any) => (
         <List className={classes.root}>
           <ListItem
             //    key={post.id}
@@ -71,10 +79,10 @@ export const MessagesList: React.FC<Props> = () => {
             alignItems="flex-start"
           >
             <ListItemAvatar>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+              <Avatar alt="Remy Sharp" src={message.from.profile.avatar} />
             </ListItemAvatar>
             <ListItemText
-              primary="Brunch this weekend?"
+              primary={`${message.from.firstName} ${message.from.lastName}`}
               secondary={
                 <React.Fragment>
                   <Typography
@@ -83,58 +91,15 @@ export const MessagesList: React.FC<Props> = () => {
                     className={classes.inline}
                     color="textPrimary"
                   >
-                    Ali Connors
                   </Typography>
-                  {" — I'll be in your neighborhood doing errands this…"}
+                  {` — ${message.content}`}
                 </React.Fragment>
               }
             />
           </ListItem>
           <Divider variant="inset" component="li" />
-          <ListItem alignItems="flex-start">
-            <ListItemAvatar>
-              <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primary="Summer BBQ"
-              secondary={
-                <React.Fragment>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    className={classes.inline}
-                    color="textPrimary"
-                  >
-                    to Scott, Alex, Jennifer
-                  </Typography>
-                  {" — Wish I could come, but I'm out of town this…"}
-                </React.Fragment>
-              }
-            />
-          </ListItem>
-          <Divider variant="inset" component="li" />
-          <ListItem alignItems="flex-start">
-            <ListItemAvatar>
-              <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primary="Oui Oui"
-              secondary={
-                <React.Fragment>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    className={classes.inline}
-                    color="textPrimary"
-                  >
-                    Sandra Adams
-                  </Typography>
-                  {" — Do you have Paris recommendations? Have you ever…"}
-                </React.Fragment>
-              }
-            />
-          </ListItem>
         </List>
+      ))}
       </div>
     </Grid>
   );

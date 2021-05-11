@@ -46,6 +46,17 @@ export type LoginResponse = {
   user: Users;
 };
 
+export type Message = {
+  __typename?: 'Message';
+  id: Scalars['Int'];
+  content: Scalars['String'];
+  dateSent: Scalars['DateTime'];
+  fromId: Scalars['Int'];
+  from: Users;
+  toId: Scalars['Int'];
+  to: Users;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   updateProfile: Scalars['Boolean'];
@@ -55,6 +66,7 @@ export type Mutation = {
   revokeRefreshTokensForUser: Scalars['Boolean'];
   loginUser: LoginResponse;
   registerUser: Scalars['Boolean'];
+  sendMessage: Scalars['Boolean'];
   createPost: Scalars['Boolean'];
   deletePost: Scalars['Boolean'];
   likePost: Scalars['Boolean'];
@@ -96,6 +108,13 @@ export type MutationRegisterUserArgs = {
   username: Scalars['String'];
   lastName: Scalars['String'];
   firstName: Scalars['String'];
+};
+
+
+export type MutationSendMessageArgs = {
+  content: Scalars['String'];
+  dateSent: Scalars['DateTime'];
+  toId: Scalars['Int'];
 };
 
 
@@ -165,8 +184,15 @@ export type Query = {
   bye: Scalars['String'];
   getAllUsers: Array<Users>;
   getCurrentUser?: Maybe<Users>;
+  getAllUserMessages: Array<Message>;
+  getAllMessagesFromUser: Array<Message>;
   getAllPosts: Array<Post>;
   getAllUserPosts: Array<Post>;
+};
+
+
+export type QueryGetAllMessagesFromUserArgs = {
+  fromId: Scalars['Int'];
 };
 
 
@@ -277,6 +303,32 @@ export type GetAllPostsQuery = (
       & { profile: (
         { __typename?: 'Profile' }
         & Pick<Profile, 'id' | 'avatar'>
+      ) }
+    ) }
+  )> }
+);
+
+export type GetAllUserMessagesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAllUserMessagesQuery = (
+  { __typename?: 'Query' }
+  & { getAllUserMessages: Array<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'id' | 'content' | 'fromId' | 'toId'>
+    & { from: (
+      { __typename?: 'Users' }
+      & Pick<Users, 'firstName' | 'lastName' | 'username'>
+      & { profile: (
+        { __typename?: 'Profile' }
+        & Pick<Profile, 'avatar'>
+      ) }
+    ), to: (
+      { __typename?: 'Users' }
+      & Pick<Users, 'firstName' | 'lastName' | 'username'>
+      & { profile: (
+        { __typename?: 'Profile' }
+        & Pick<Profile, 'avatar'>
       ) }
     ) }
   )> }
@@ -678,6 +730,59 @@ export function useGetAllPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type GetAllPostsQueryHookResult = ReturnType<typeof useGetAllPostsQuery>;
 export type GetAllPostsLazyQueryHookResult = ReturnType<typeof useGetAllPostsLazyQuery>;
 export type GetAllPostsQueryResult = Apollo.QueryResult<GetAllPostsQuery, GetAllPostsQueryVariables>;
+export const GetAllUserMessagesDocument = gql`
+    query GetAllUserMessages {
+  getAllUserMessages {
+    id
+    content
+    fromId
+    from {
+      firstName
+      lastName
+      username
+      profile {
+        avatar
+      }
+    }
+    toId
+    to {
+      firstName
+      lastName
+      username
+      profile {
+        avatar
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAllUserMessagesQuery__
+ *
+ * To run a query within a React component, call `useGetAllUserMessagesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllUserMessagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllUserMessagesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAllUserMessagesQuery(baseOptions?: Apollo.QueryHookOptions<GetAllUserMessagesQuery, GetAllUserMessagesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllUserMessagesQuery, GetAllUserMessagesQueryVariables>(GetAllUserMessagesDocument, options);
+      }
+export function useGetAllUserMessagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllUserMessagesQuery, GetAllUserMessagesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllUserMessagesQuery, GetAllUserMessagesQueryVariables>(GetAllUserMessagesDocument, options);
+        }
+export type GetAllUserMessagesQueryHookResult = ReturnType<typeof useGetAllUserMessagesQuery>;
+export type GetAllUserMessagesLazyQueryHookResult = ReturnType<typeof useGetAllUserMessagesLazyQuery>;
+export type GetAllUserMessagesQueryResult = Apollo.QueryResult<GetAllUserMessagesQuery, GetAllUserMessagesQueryVariables>;
 export const GetAllUsersDocument = gql`
     query getAllUsers {
   getAllUsers {

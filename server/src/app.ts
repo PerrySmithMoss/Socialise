@@ -6,6 +6,7 @@ import { Users } from "./Entities/Users";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { UserResolver } from "./Schema/Resolvers/UserResolver";
+import { MessageResolver } from "./Schema/Resolvers/MessageReslolver";
 import cookieParser from "cookie-parser";
 import { verify } from "jsonwebtoken";
 import { createAccessKey, createRefreshKey } from "./auth/auth";
@@ -16,6 +17,7 @@ import { Profile } from "./Entities/Profile";
 import { graphqlUploadExpress } from "graphql-upload";
 import { LikedPost } from "./Entities/LikedPost";
 import { Comment } from "./Entities/Comment";
+import { Message } from "./Entities/Message";
 
 const main = async () => {
   const app: Application = express();
@@ -38,8 +40,8 @@ const main = async () => {
     username: `${process.env.USERNAME}`,
     password: `${process.env.PASSWORD}`,
     logging: true,
-    synchronize: true,
-    entities: [Users, Post, Profile, LikedPost, Comment],
+    synchronize: false,
+    entities: [Users, Post, Profile, LikedPost, Comment, Message],
   });
 
   app.post("/refresh_token", async (req: Request, res: Response) => {
@@ -75,7 +77,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [UserResolver, PostResolver],
+      resolvers: [UserResolver, PostResolver, MessageResolver],
     }),
     context: ({ req, res }) => ({ req, res }),
     uploads: false

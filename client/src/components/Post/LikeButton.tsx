@@ -13,9 +13,10 @@ import gql from "graphql-tag";
 
 interface Props {
   post: PostSnippetFragment;
+  currentUser: any
 }
 
-export const LikeButton: React.FC<Props> = ({ post }) => {
+export const LikeButton: React.FC<Props> = ({ post, currentUser }) => {
   const [likePost, { client }] = useLikePostMutation();
   //   const { data, loading } = useGetCurrentUserQuery();
   const [liked, setLiked] = useState(false);
@@ -45,7 +46,7 @@ export const LikeButton: React.FC<Props> = ({ post }) => {
     } else {
       setLiked(false);
     }
-  }, [post]);
+  }, [post, currentUser]);
 
   const handleLikePost = async () => {
     await likePost({

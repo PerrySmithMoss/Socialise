@@ -1,4 +1,3 @@
-import { compare, hash } from "bcryptjs";
 import { verify } from "jsonwebtoken";
 import {
   Arg,
@@ -12,7 +11,6 @@ import {
   UseMiddleware,
 } from "type-graphql";
 import { createQueryBuilder, getConnection } from "typeorm";
-import { createAccessKey, createRefreshKey } from "../../auth/auth";
 import { isAuth } from "../../auth/middleware/isAuth";
 import { sendRefreshKey } from "../../auth/sendRefreshKey";
 import { LikedPost } from "../../Entities/LikedPost";

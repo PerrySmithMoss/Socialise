@@ -8,12 +8,16 @@ import SearchIcon from '@material-ui/icons/Search';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: 300,
+      width: 305,
     },
     textBox: {
-        // marginLeft: 10,
+        marginLeft: 10,
+        marginRight: 10,
         width: "100%",
       },
+      textField: {
+        borderRadius: "20px"
+      }
   })
 );
 
@@ -28,6 +32,11 @@ export const SearchBar: React.FC = () => {
         //     setContent(event.target.value);
         //   }}
           className={classes.textBox}
+          InputProps={{
+            classes: {
+              root: classes.textField
+            }
+          }}
           id="outlined-size-small"
           variant="outlined"
           size="small"
