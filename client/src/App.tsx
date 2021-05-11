@@ -11,7 +11,7 @@ const App: React.FC = () => {
       credentials: "include",
     }).then(async (x) => {
       const { accessToken } = await x.json();
-      console.log(accessToken);
+      // console.log(accessToken);
       setAccessKey(accessToken);
       setLoading(false);
     });

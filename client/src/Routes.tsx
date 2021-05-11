@@ -6,6 +6,7 @@ import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { Profile } from "./pages/Profile";
 import { Register } from "./pages/Register";
+import { Messages } from "./pages/Messages";
 
 export const Routes: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ export const Routes: React.FC = () => {
         <Route exact path="/register" component={Register} />
         <Route exact path="/bye" component={Bye} />
         <Route exact path="/profile" component={Profile} />
+        <Route exact path="/messages" component={Messages} />
       </Switch>
     </BrowserRouter>
   );

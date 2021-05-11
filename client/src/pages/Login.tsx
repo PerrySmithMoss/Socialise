@@ -33,20 +33,26 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
   const handleLoginUser = async () => {
     const res = await loginUser({
       variables: { email, password },
+      // refetchQueries: [{ query: GetCurrentUserDocument }]
       update: (store, { data }) => {
         if (!data) {
           return null;
         }
-        // store.writeQuery<GetCurrentUserQuery>({
-        //   query: GetCurrentUserDocument,
-        //   data: {
-        //     getCurrentUser: data.loginUser.user,
-        //   },
-        // });
+        const currentUser = store.readQuery<GetCurrentUserQuery>({
+          query: GetCurrentUserDocument
+        })
+
+        store.writeQuery<GetCurrentUserQuery>({
+          query: GetCurrentUserDocument,
+          data: {
+            getCurrentUser: data?.loginUser?.user as any,
+            // getCurrentUser: currentUser as any
+          },
+        });
       },
     });
 
-    console.log(res);
+    console.log("Logged in user:", res);
 
     if (res && res.data) {
       setAccessKey(res.data.loginUser.accessToken);

@@ -315,10 +315,28 @@ export type GetAllUserPostsQuery = (
   { __typename?: 'Query' }
   & { getAllUserPosts: Array<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'content' | 'points' | 'voteStatus' | 'datePublished'>
-    & { user: (
+    & Pick<Post, 'id' | 'userId' | 'firstName' | 'lastName' | 'content' | 'voteStatus' | 'datePublished' | 'userName' | 'points' | 'commentsCount'>
+    & { likes: Array<(
+      { __typename?: 'LikedPost' }
+      & Pick<LikedPost, 'userId'>
+    )>, comments: Array<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'comment'>
+      & { user: (
+        { __typename?: 'Users' }
+        & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username'>
+        & { profile: (
+          { __typename?: 'Profile' }
+          & Pick<Profile, 'avatar'>
+        ) }
+      ) }
+    )>, user: (
       { __typename?: 'Users' }
-      & Pick<Users, 'id' | 'firstName' | 'lastName' | 'email' | 'username' | 'followers' | 'following'>
+      & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username' | 'email'>
+      & { profile: (
+        { __typename?: 'Profile' }
+        & Pick<Profile, 'id' | 'avatar'>
+      ) }
     ) }
   )> }
 );
@@ -751,19 +769,41 @@ export const GetAllUserPostsDocument = gql`
     query GetAllUserPosts {
   getAllUserPosts {
     id
+    userId
+    firstName
+    lastName
     content
-    points
     voteStatus
-    datePublished
+    likes {
+      userId
+    }
+    comments {
+      comment
+      user {
+        id
+        firstName
+        lastName
+        username
+        profile {
+          avatar
+        }
+      }
+    }
     user {
       id
       firstName
       lastName
-      email
       username
-      followers
-      following
+      email
+      profile {
+        id
+        avatar
+      }
     }
+    datePublished
+    userName
+    points
+    commentsCount
   }
 }
     `;

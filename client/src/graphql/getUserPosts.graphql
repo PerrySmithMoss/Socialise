@@ -1,18 +1,40 @@
 query GetAllUserPosts {
   getAllUserPosts {
     id
+    userId
+    firstName
+    lastName
     content
-    points
     voteStatus
-    datePublished
+    likes {
+      userId
+    }
+    comments {
+      comment
+      user{
+        id
+        firstName
+        lastName
+        username
+        profile {
+          avatar
+        }
+      }
+    }
     user {
       id
       firstName
       lastName
-      email
       username
-      followers
-      following
+      email
+      profile {
+        id
+        avatar
+      }
     }
+    datePublished
+    userName
+    points
+    commentsCount
   }
 }

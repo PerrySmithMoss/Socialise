@@ -50,15 +50,25 @@ export class PostResolver {
       const userId = payload.userId;
       console.log("Your user id is:" + payload.userId);
 
-      const qb = getConnection()
-        .getRepository(Post)
-        .createQueryBuilder("p")
-        .innerJoinAndSelect("p.user", "u", "u.id = p.userID")
-        .where("p.userID = :id", { id: payload.userId })
-        .orderBy("p.datePublished", "DESC");
+      // const qb = getConnection()
+      //   .getRepository(Post)
+      //   .createQueryBuilder("p")
+      //   .innerJoinAndSelect("p.user", "u", "u.id = p.userID")
+      //   .where("p.userID = :id", { id: payload.userId })
+      //   .orderBy("p.datePublished", "DESC");
 
-      const posts = await qb.getMany();
-      return posts;
+      // const posts = await qb.getMany();
+     const userPosts = await Post.find({relations: ['likes', 'user', 'user.profile', 'comments', 'comments.user', 'comments.user.profile'],
+     where: {
+      userId: userId
+     },
+     order: {
+      datePublished: "DESC",
+    },
+  });
+    console.log(userPosts)
+
+      return userPosts;
     } catch (e) {
       console.log(e);
       return null;
