@@ -1,9 +1,10 @@
-import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import { MyContext } from "../../Types/MyContext";
 import { verify } from "jsonwebtoken";
 import { Users } from "../../Entities/Users";
 import { Message } from "../../Entities/Message";
 import { In, Not } from "typeorm";
+import { isAuth } from "../../auth/middleware/isAuth";
 
 @Resolver()
 export class MessageResolver {
@@ -92,7 +93,7 @@ export class MessageResolver {
         ],
         relations: ["from", "from.profile", "to", "to.profile"],
         order: {
-          dateSent: "DESC",
+          dateSent: "ASC",
         },
       });
 
@@ -103,38 +104,33 @@ export class MessageResolver {
   }
 
   @Mutation(() => Boolean)
-  // @UseMiddleware(isAuth)
+  @UseMiddleware(isAuth)
   async sendMessage(
     @Arg("toId", () => Int) toId: number,
-    // @Arg("fromId", () => Int) fromId: number,
     @Arg("dateSent") dateSent: Date,
-    @Arg("content", () => String) content: string
-    // @Ctx() context: MyContext
+    @Arg("content", () => String) content: string,
+    @Ctx() context: MyContext
   ) {
-    // const authorization = context.req.headers["authorization"];
-    // console.log(authorization);
-
+    const authorization = context.req.headers["authorization"];
+    console.log(authorization);
     try {
-      // const token = authorization!.split(" ")[1];
-      // const payload: any = verify(token, process.env.ACCESS_KEY!);
-      // const userId = payload.userId;
-      // console.log("Your user id is:" + payload.userId);
+      const token = authorization!.split(" ")[1];
+      const payload: any = verify(token, process.env.ACCESS_KEY!);
+      const userId = payload.userId;
+      console.log("Your user id is:" + payload.userId);
 
       const recipient = await Users.findOne({ where: { id: toId } });
 
       if (!recipient) {
         throw new Error("User not found...");
       }
-      // else if(recipient.id === 18) {
-      //   throw new Error("You cannot message yourself")
-      // }
 
       if (content.trim() === "") {
         throw new Error("Message is empty...");
       }
 
       await Message.insert({
-        fromId: 17,
+        fromId: userId,
         toId: toId,
         dateSent: dateSent,
         content: content,

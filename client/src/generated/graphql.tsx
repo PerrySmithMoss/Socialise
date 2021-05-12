@@ -503,6 +503,18 @@ export type RegisterMutation = (
   & Pick<Mutation, 'registerUser'>
 );
 
+export type SendMessageMutationVariables = Exact<{
+  toId: Scalars['Int'];
+  dateSent: Scalars['DateTime'];
+  content: Scalars['String'];
+}>;
+
+
+export type SendMessageMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'sendMessage'>
+);
+
 export type UpdateUserProfileMutationVariables = Exact<{
   userId: Scalars['Int'];
   input: ProfileUpdateInput;
@@ -1265,6 +1277,39 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const SendMessageDocument = gql`
+    mutation SendMessage($toId: Int!, $dateSent: DateTime!, $content: String!) {
+  sendMessage(toId: $toId, dateSent: $dateSent, content: $content)
+}
+    `;
+export type SendMessageMutationFn = Apollo.MutationFunction<SendMessageMutation, SendMessageMutationVariables>;
+
+/**
+ * __useSendMessageMutation__
+ *
+ * To run a mutation, you first call `useSendMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendMessageMutation, { data, loading, error }] = useSendMessageMutation({
+ *   variables: {
+ *      toId: // value for 'toId'
+ *      dateSent: // value for 'dateSent'
+ *      content: // value for 'content'
+ *   },
+ * });
+ */
+export function useSendMessageMutation(baseOptions?: Apollo.MutationHookOptions<SendMessageMutation, SendMessageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SendMessageMutation, SendMessageMutationVariables>(SendMessageDocument, options);
+      }
+export type SendMessageMutationHookResult = ReturnType<typeof useSendMessageMutation>;
+export type SendMessageMutationResult = Apollo.MutationResult<SendMessageMutation>;
+export type SendMessageMutationOptions = Apollo.BaseMutationOptions<SendMessageMutation, SendMessageMutationVariables>;
 export const UpdateUserProfileDocument = gql`
     mutation UpdateUserProfile($userId: Int!, $input: ProfileUpdateInput!) {
   updateProfile(userId: $userId, input: $input)
