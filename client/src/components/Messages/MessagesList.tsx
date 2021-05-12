@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -10,11 +10,18 @@ import { Link } from "react-router-dom";
 import Grid, { GridSpacing } from "@material-ui/core/Grid";
 import { SearchBar } from "../../components//Messages/SearchBar";
 import { LeftNav } from "../../components/Home/LeftNav";
-import { useGetAllUserMessagesQuery } from "../../generated/graphql";
+import {
+  useGetAllUserMessagesQuery,
+  useGetAllMessagesFromUserQuery,
+} from "../../generated/graphql";
 import { Box, Divider } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
 import AddCommentIcon from "@material-ui/icons/AddComment";
+import { gql, useLazyQuery } from "@apollo/client";
+import { Message } from "./Message";
+import Button from "@material-ui/core/Button";
+
 interface Props {}
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -40,67 +47,181 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const GET_MESSAGES = gql`
+  query GetAllMessagesFromUser($fromId: Int!) {
+    getAllMessagesFromUser(fromId: $fromId) {
+      id
+      content
+      dateSent
+      fromId
+      from {
+        id
+        firstName
+        lastName
+        username
+        profile {
+          avatar
+        }
+      }
+      toId
+      to {
+        id
+        firstName
+        lastName
+        username
+        profile {
+          avatar
+        }
+      }
+    }
+  }
+`;
+
 export const MessagesList: React.FC<Props> = () => {
   const classes = useStyles();
-  const { data } = useGetAllUserMessagesQuery({ fetchPolicy: "network-only" });
-  console.log(data)
+  const { data: allMessages } = useGetAllUserMessagesQuery({
+    fetchPolicy: "network-only",
+  });
+  // const { data: getMessagesFromUser } = useGetAllMessagesFromUserQuery({ fetchPolicy: "network-only" });
+
+  const [
+    getAllMessagesFromUser,
+    { loading: messagesLoading, data: messagesData },
+  ] = useLazyQuery(GET_MESSAGES);
+
+  const [selectedUserId, setSelectedUserId] = useState(null);
+
+  const handleSelectedUserClick = (fromId: number) => {};
+
+  useEffect(() => {
+    if (selectedUserId) {
+      getAllMessagesFromUser({
+        variables: {
+          fromId: selectedUserId as any,
+        },
+      });
+
+      if (messagesData) {
+        console.log(messagesData);
+      }
+    }
+  }, [selectedUserId]);
+
+  console.log(allMessages);
+  console.log(messagesData);
   return (
-    <Grid item className={classes.grid}>
-      <div className={classes.test}>
-        <Box width={305} display="flex" pl={2} bgcolor="background.paper">
-          <Box flexGrow={1}>
-            <h2>Messages</h2>
+    <>
+      <Grid item className={classes.grid}>
+        <div className={classes.test}>
+          <Box 
+          width={305} display="flex" pl={2} bgcolor="background.paper">
+            <Box flexGrow={1}>
+              <h2>Messages</h2>
+            </Box>
+
+            <Box mt={1}>
+              <IconButton style={{ color: "#14ffec" }} aria-label="delete">
+                <SettingsIcon fontSize="small" />
+              </IconButton>
+              <IconButton style={{ color: "#14ffec" }} aria-label="delete">
+                <AddCommentIcon fontSize="small" />
+              </IconButton>
+            </Box>
           </Box>
 
-          <Box mt={1}>
-            <IconButton style={{ color: "#14ffec" }} aria-label="delete">
-              <SettingsIcon fontSize="small" />
-            </IconButton>
-            <IconButton style={{ color: "#14ffec" }} aria-label="delete">
-              <AddCommentIcon fontSize="small" />
-            </IconButton>
-          </Box>
-        </Box>
+          <Divider />
+          <Box display="flex" pb={1} bgcolor="background.paper"></Box>
+          <SearchBar />
+          <Box display="flex" pt={1} bgcolor="background.paper"></Box>
+          <Divider />
 
-        <Divider />
-        <Box display="flex" pb={1} bgcolor="background.paper"></Box>
-        <SearchBar />
-        <Box display="flex" pt={1} bgcolor="background.paper"></Box>
-        <Divider />
+          {allMessages?.getAllUserMessages.map((message: any) => (
+            <List className={classes.root}>
+              <ListItem
+                //    key={post.id}
+                button
+                onClick={() => setSelectedUserId(message.from.id)}
+                // component={Link}
+                //  to={{ pathname: `/messages/${message.id}`, state: {message} }}
+                // to={{ pathname: `/messages/${2}` }}
+                alignItems="flex-start"
+              >
+                <ListItemAvatar>
+                  <Avatar alt="Remy Sharp" src={message.from.profile.avatar} />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={`${message.from.firstName} ${message.from.lastName}`}
+                  secondary={
+                    <React.Fragment>
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        className={classes.inline}
+                        color="textPrimary"
+                      ></Typography>
+                      {` — ${message.content}`}
+                    </React.Fragment>
+                  }
+                />
+              </ListItem>
+              <Divider variant="inset" component="li" />
+            </List>
+          ))}
+        </div>
+      </Grid>
 
-        {data?.getAllUserMessages.map((message: any) => (
-        <List className={classes.root}>
-          <ListItem
-            //    key={post.id}
-            button
-            component={Link}
-            //  to={{ pathname: `/messages/${message.id}`, state: {message} }}
-            to={{ pathname: `/messages/${2}` }}
-            alignItems="flex-start"
-          >
-            <ListItemAvatar>
-              <Avatar alt="Remy Sharp" src={message.from.profile.avatar} />
-            </ListItemAvatar>
-            <ListItemText
-              primary={`${message.from.firstName} ${message.from.lastName}`}
-              secondary={
-                <React.Fragment>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    className={classes.inline}
-                    color="textPrimary"
-                  >
-                  </Typography>
-                  {` — ${message.content}`}
-                </React.Fragment>
-              }
-            />
-          </ListItem>
-          <Divider variant="inset" component="li" />
-        </List>
-      ))}
-      </div>
-    </Grid>
+      {messagesData && messagesData.getAllMessagesFromUser.length > 0 ? (
+        <Message messagesData={messagesData} selectedUserId={selectedUserId}/>
+      ) : (
+        <Grid item className={classes.grid}>
+          <div className={classes.test}>
+            <Box
+              width={430}
+              display="flex"
+              pl={2}
+              pt={10}
+              justifyContent="center"
+              bgcolor="background.paper"
+            >
+              <Box>
+                <h2>You don't have a message selected</h2>
+              </Box>
+            </Box>
+            <Box
+              width={430}
+              display="flex"
+              pl={2}
+              justifyContent="center"
+              bgcolor="background.paper"
+            >
+              <Box>
+                <p>
+                  Choose one from your existing messages, or start a new one.
+                </p>
+              </Box>
+            </Box>
+            <Box
+              width={430}
+              height={120}
+              display="flex"
+              pl={2}
+              justifyContent="center"
+              bgcolor="background.paper"
+            >
+              <Box>
+                <Button
+                  // onClick={() => handleCreatePost()}
+                  variant="contained"
+                  color="primary"
+                  style={{ backgroundColor: "#009d91", color: "white" }}
+                >
+                  Message
+                </Button>
+              </Box>
+            </Box>
+          </div>
+        </Grid>
+      )}
+    </>
   );
 };

@@ -36,9 +36,11 @@ export const CommentButton: React.FC<Props> = ({ post }) => {
     const user = client.readQuery({
       query: GET_CURRENT_USER,
     });
+    // May need to comment this out
     if (user.getCurrentUser === null) {
-      return;
-    } else if (
+      console.log("You're not logged in...")
+    } 
+    else if (
       post.likes.find((like) => like.userId === user.getCurrentUser.id)
     ) {
       setLiked(true);

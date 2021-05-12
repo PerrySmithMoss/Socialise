@@ -183,11 +183,17 @@ export type Query = {
   hello: Scalars['String'];
   bye: Scalars['String'];
   getAllUsers: Array<Users>;
+  getSpecificUserInfo: Users;
   getCurrentUser?: Maybe<Users>;
   getAllUserMessages: Array<Message>;
   getAllMessagesFromUser: Array<Message>;
   getAllPosts: Array<Post>;
   getAllUserPosts: Array<Post>;
+};
+
+
+export type QueryGetSpecificUserInfoArgs = {
+  userId: Scalars['Int'];
 };
 
 
@@ -275,6 +281,34 @@ export type DeleteUserMutation = (
   & Pick<Mutation, 'deleteUser'>
 );
 
+export type GetAllMessagesFromUserQueryVariables = Exact<{
+  fromId: Scalars['Int'];
+}>;
+
+
+export type GetAllMessagesFromUserQuery = (
+  { __typename?: 'Query' }
+  & { getAllMessagesFromUser: Array<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'id' | 'content' | 'fromId' | 'toId'>
+    & { from: (
+      { __typename?: 'Users' }
+      & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username'>
+      & { profile: (
+        { __typename?: 'Profile' }
+        & Pick<Profile, 'avatar'>
+      ) }
+    ), to: (
+      { __typename?: 'Users' }
+      & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username'>
+      & { profile: (
+        { __typename?: 'Profile' }
+        & Pick<Profile, 'avatar'>
+      ) }
+    ) }
+  )> }
+);
+
 export type GetAllPostsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -318,14 +352,14 @@ export type GetAllUserMessagesQuery = (
     & Pick<Message, 'id' | 'content' | 'fromId' | 'toId'>
     & { from: (
       { __typename?: 'Users' }
-      & Pick<Users, 'firstName' | 'lastName' | 'username'>
+      & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username'>
       & { profile: (
         { __typename?: 'Profile' }
         & Pick<Profile, 'avatar'>
       ) }
     ), to: (
       { __typename?: 'Users' }
-      & Pick<Users, 'firstName' | 'lastName' | 'username'>
+      & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username'>
       & { profile: (
         { __typename?: 'Profile' }
         & Pick<Profile, 'avatar'>
@@ -358,6 +392,23 @@ export type GetCurrentUserQuery = (
       & Pick<Profile, 'id' | 'bio' | 'avatar' | 'website' | 'location'>
     ) }
   )> }
+);
+
+export type GetSpecificUserInfoQueryVariables = Exact<{
+  userId: Scalars['Int'];
+}>;
+
+
+export type GetSpecificUserInfoQuery = (
+  { __typename?: 'Query' }
+  & { getSpecificUserInfo: (
+    { __typename?: 'Users' }
+    & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username'>
+    & { profile: (
+      { __typename?: 'Profile' }
+      & Pick<Profile, 'avatar'>
+    ) }
+  ) }
 );
 
 export type GetAllUserPostsQueryVariables = Exact<{ [key: string]: never; }>;
@@ -661,6 +712,62 @@ export function useDeleteUserMutation(baseOptions?: Apollo.MutationHookOptions<D
 export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutation>;
 export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
 export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
+export const GetAllMessagesFromUserDocument = gql`
+    query GetAllMessagesFromUser($fromId: Int!) {
+  getAllMessagesFromUser(fromId: $fromId) {
+    id
+    content
+    fromId
+    from {
+      id
+      firstName
+      lastName
+      username
+      profile {
+        avatar
+      }
+    }
+    toId
+    to {
+      id
+      firstName
+      lastName
+      username
+      profile {
+        avatar
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAllMessagesFromUserQuery__
+ *
+ * To run a query within a React component, call `useGetAllMessagesFromUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllMessagesFromUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllMessagesFromUserQuery({
+ *   variables: {
+ *      fromId: // value for 'fromId'
+ *   },
+ * });
+ */
+export function useGetAllMessagesFromUserQuery(baseOptions: Apollo.QueryHookOptions<GetAllMessagesFromUserQuery, GetAllMessagesFromUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllMessagesFromUserQuery, GetAllMessagesFromUserQueryVariables>(GetAllMessagesFromUserDocument, options);
+      }
+export function useGetAllMessagesFromUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllMessagesFromUserQuery, GetAllMessagesFromUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllMessagesFromUserQuery, GetAllMessagesFromUserQueryVariables>(GetAllMessagesFromUserDocument, options);
+        }
+export type GetAllMessagesFromUserQueryHookResult = ReturnType<typeof useGetAllMessagesFromUserQuery>;
+export type GetAllMessagesFromUserLazyQueryHookResult = ReturnType<typeof useGetAllMessagesFromUserLazyQuery>;
+export type GetAllMessagesFromUserQueryResult = Apollo.QueryResult<GetAllMessagesFromUserQuery, GetAllMessagesFromUserQueryVariables>;
 export const GetAllPostsDocument = gql`
     query GetAllPosts {
   getAllPosts {
@@ -737,6 +844,7 @@ export const GetAllUserMessagesDocument = gql`
     content
     fromId
     from {
+      id
       firstName
       lastName
       username
@@ -746,6 +854,7 @@ export const GetAllUserMessagesDocument = gql`
     }
     toId
     to {
+      id
       firstName
       lastName
       username
@@ -870,6 +979,47 @@ export function useGetCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type GetCurrentUserQueryHookResult = ReturnType<typeof useGetCurrentUserQuery>;
 export type GetCurrentUserLazyQueryHookResult = ReturnType<typeof useGetCurrentUserLazyQuery>;
 export type GetCurrentUserQueryResult = Apollo.QueryResult<GetCurrentUserQuery, GetCurrentUserQueryVariables>;
+export const GetSpecificUserInfoDocument = gql`
+    query GetSpecificUserInfo($userId: Int!) {
+  getSpecificUserInfo(userId: $userId) {
+    id
+    firstName
+    lastName
+    username
+    profile {
+      avatar
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetSpecificUserInfoQuery__
+ *
+ * To run a query within a React component, call `useGetSpecificUserInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSpecificUserInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSpecificUserInfoQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetSpecificUserInfoQuery(baseOptions: Apollo.QueryHookOptions<GetSpecificUserInfoQuery, GetSpecificUserInfoQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetSpecificUserInfoQuery, GetSpecificUserInfoQueryVariables>(GetSpecificUserInfoDocument, options);
+      }
+export function useGetSpecificUserInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSpecificUserInfoQuery, GetSpecificUserInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetSpecificUserInfoQuery, GetSpecificUserInfoQueryVariables>(GetSpecificUserInfoDocument, options);
+        }
+export type GetSpecificUserInfoQueryHookResult = ReturnType<typeof useGetSpecificUserInfoQuery>;
+export type GetSpecificUserInfoLazyQueryHookResult = ReturnType<typeof useGetSpecificUserInfoLazyQuery>;
+export type GetSpecificUserInfoQueryResult = Apollo.QueryResult<GetSpecificUserInfoQuery, GetSpecificUserInfoQueryVariables>;
 export const GetAllUserPostsDocument = gql`
     query GetAllUserPosts {
   getAllUserPosts {

@@ -68,8 +68,14 @@ export class UserResolver {
   }
 
   @Query(() => [Users])
-  getAllUsers() {
-    return Users.find({ relations: ["profile"] });
+  async getAllUsers() {
+    return await Users.find({ relations: ["profile"] });
+  }
+
+  @Query(() => Users)
+  @UseMiddleware(isAuth)
+  async getSpecificUserInfo(@Arg("userId", () => Int) userId: number) {
+    return await Users.findOne(userId, { relations: ["profile"] });
   }
 
   @Query(() => Users, { nullable: true })
@@ -132,32 +138,31 @@ export class UserResolver {
     try {
       const { createReadStream, filename } = file;
 
-      const { ext } = path.parse(filename)
-      const randomString = crypto.randomBytes(20).toString('hex') + ext;
+      const { ext } = path.parse(filename);
+      const randomString = crypto.randomBytes(20).toString("hex") + ext;
 
       const stream = createReadStream();
-      console.log("Directory: ", __dirname)
+      console.log("Directory: ", __dirname);
       const pathNameForServer = path.join(
         __dirname,
         `../../../public/images/${randomString}`
       );
-      const pathNameForClient = `http://localhost:5000/images/${randomString}`
+      const pathNameForClient = `http://localhost:5000/images/${randomString}`;
       stream.pipe(fs.createWriteStream(pathNameForServer));
 
       const user = await Users.findOneOrFail(userId, {
         relations: ["profile"],
       });
 
-      await Profile.update(user.profileId, {avatar: pathNameForClient});
+      await Profile.update(user.profileId, { avatar: pathNameForClient });
 
       return {
         url: `http://localhost:5000/images/${filename}`,
       };
-
     } catch (err) {
       return {
-        url: err
-      }
+        url: err,
+      };
       // return false;
     }
   }

@@ -24,7 +24,7 @@ export const SearchBar: React.FC = () => {
     const classes = useStyles();
     return (
     <div className={classes.root}>
-        <Box mb={2} mt={2} display="flex"  bgcolor="background.paper">
+        <Box display="flex"  bgcolor="background.paper">
         <TextField
         //   value={content}
         //   onChange={(event) => {

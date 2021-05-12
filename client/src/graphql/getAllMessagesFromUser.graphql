@@ -1,5 +1,9 @@
-query GetAllUserMessages{
-  getAllUserMessages {
+query GetAllMessagesFromUser(
+    $fromId: Int!
+) {
+  getAllMessagesFromUser (
+      fromId: $fromId
+  ) {
     id
     content
     fromId

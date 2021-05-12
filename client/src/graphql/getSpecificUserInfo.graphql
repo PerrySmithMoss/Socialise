@@ -1,0 +1,11 @@
+query GetSpecificUserInfo($userId: Int!){
+  getSpecificUserInfo(userId: $userId) {
+    id
+    firstName
+    lastName
+    username
+    profile {
+      avatar
+    }
+  }
+}

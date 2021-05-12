@@ -44,8 +44,6 @@ export const Messages: React.FC<Props> = () => {
           
               <MessagesList />
 
-          {/*  */}
-                <Message />
         </Grid>
       </Grid>
     </Grid>
