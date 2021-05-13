@@ -19,6 +19,8 @@ import { LikedPost } from "./Entities/LikedPost";
 import { Comment } from "./Entities/Comment";
 import { Message } from "./Entities/Message";
 
+import http from "http";
+
 const main = async () => {
   const app: Application = express();
   app.use(
@@ -28,7 +30,7 @@ const main = async () => {
     })
   );
   app.use(cookieParser());
-  app.use(express.static('public'));
+  app.use(express.static("public"));
   app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
 
   await createConnection({
@@ -80,19 +82,38 @@ const main = async () => {
       resolvers: [UserResolver, PostResolver, MessageResolver],
     }),
     context: ({ req, res }) => ({ req, res }),
-    uploads: false
+    subscriptions: {
+      path: "/subscriptions",
+      onConnect: () => console.log("Client connected for subscriptions"),
+      onDisconnect: () => console.log("Client disconnected from subscriptions")
+    },
+    uploads: false,
   });
 
+  const httpServer = http.createServer(app);
+
   apolloServer.applyMiddleware({ app, cors: false });
+  apolloServer.installSubscriptionHandlers(httpServer);
 
   app.get("/", (req: Request, res: Response) => {
     res.send("Hello");
   });
 
   const PORT = process.env.APP_PORT || 5000;
-  app.listen(PORT, () =>
-    console.log(`Server running on http://localhost:${PORT}`)
-  );
+  httpServer.listen(PORT, () => { 
+    console.log(`🚀 Server running on http://localhost:${PORT}`)
+    console.log(
+      `🚀 Subscriptions ready at ws://localhost:${PORT}${apolloServer.subscriptionsPath}`,
+    );
+    });
+
+  // const httpPort = 4003;
+
+  // httpServer.listen(httpPort, () => {
+  //   console.log(
+  //     `🚀 Subscriptions ready at ws://localhost:${httpPort}${apolloServer.subscriptionsPath}`
+  //   );
+  // });
 };
 
 main().catch((err) => {

@@ -26,7 +26,7 @@ export class Message extends BaseEntity {
 
   @Field(() => Int)
   @PrimaryColumn()
-  fromId: number;
+  fromId!: number;
   
   @Field(() => Users)
   @ManyToOne(() => Users, (user) => user.from)
@@ -34,7 +34,7 @@ export class Message extends BaseEntity {
 
   @Field(() => Int)
   @PrimaryColumn()
-  toId: number;
+  toId!: number;
   
   @Field(() => Users)
   @ManyToOne(() => Users, (user) => user.to)
