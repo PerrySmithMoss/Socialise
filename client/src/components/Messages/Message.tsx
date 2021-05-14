@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -16,14 +16,14 @@ import {
   GetAllUserMessagesDocument,
   useGetSpecificUserInfoQuery,
   useSendMessageMutation,
+  useNewMessageSubscription,
 } from "../../generated/graphql";
 import gql from "graphql-tag";
-import { SearchBar } from "../../components//Messages/SearchBar";
 import ImageOutlinedIcon from "@material-ui/icons/ImageOutlined";
 import VideoLibraryOutlinedIcon from "@material-ui/icons/VideoLibraryOutlined";
-import EmojiEmotionsOutlinedIcon from "@material-ui/icons/EmojiEmotionsOutlined";
 import SendIcon from "@material-ui/icons/Send";
 import moment from "moment";
+import { useQuery } from "@apollo/client";
 
 interface Props {}
 
@@ -64,6 +64,7 @@ const useStyles = makeStyles((theme: Theme) =>
 interface MessageProps {
   messagesData: any;
   selectedUserId: any;
+  // subscribeToMore: any;
 }
 
 const GET_CURRENT_USER = gql`
@@ -78,9 +79,57 @@ const GET_CURRENT_USER = gql`
   }
 `;
 
+const GET_MESSAGES = gql`
+  query GetAllMessagesFromUser($fromId: Int!) {
+    getAllMessagesFromUser(fromId: $fromId) {
+      # id
+      # content
+      # dateSent
+      # fromId
+      # from {
+      #   id
+      #   firstName
+      #   lastName
+      #   username
+      #   profile {
+      #     avatar
+      #   }
+      # }
+      # toId
+      # to {
+      #   id
+      #   firstName
+      #   lastName
+      #   username
+      #   profile {
+      #     avatar
+      #   }
+      # }
+      id
+      fromId
+      toId
+      content
+      dateSent
+    }
+  }
+`;
+
+const newMessageSubscription = gql`
+  subscription NewMessageSubscription {
+    newMessage {
+      id
+      fromId
+      toId
+      content
+      dateSent
+    }
+  }
+`;
+
 export const Message: React.FC<MessageProps> = ({
   messagesData,
   selectedUserId,
+  // subscribeToMore,
 }) => {
   const { data: specifiedUserInfo, client } = useGetSpecificUserInfoQuery({
     fetchPolicy: "network-only",
@@ -88,6 +137,32 @@ export const Message: React.FC<MessageProps> = ({
   });
 
   const [sendMessage] = useSendMessageMutation();
+  // const { data: newMessage, error: messageError } =
+  //   useNewMessageSubscription();
+
+  // const { loading, data, subscribeToMore } = useQuery(GET_MESSAGES);
+
+  // useEffect(() => {
+  //   if (messageError) {
+  //     console.log(messageError);
+  //   }
+  //   subscribeToMore({
+  //     document: newMessageSubscription,
+  //     updateQuery: (prev: any, { subscriptionData }: any) => {
+  //       console.log("Prev: ", prev);
+  //       console.log("Subscription Data: ", subscriptionData);
+
+  //       if (!subscriptionData) {
+  //         return prev;
+  //       }
+
+  //       return prev;
+  //     },
+  //   });
+  //   if (newMessage) {
+  //     console.log("New message: ", newMessage);
+  //   }
+  // }, [newMessage, messageError, subscribeToMore]);
 
   const [message, setMessage] = useState("");
 

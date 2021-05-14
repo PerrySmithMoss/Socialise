@@ -4,12 +4,14 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { ThemeProvider } from "@material-ui/styles";
 import { CssBaseline, createMuiTheme } from "@material-ui/core";
-
+import { getMainDefinition } from "@apollo/client/utilities";
+import { WebSocketLink } from "@apollo/client/link/ws";
 import {
   ApolloClient,
   InMemoryCache,
   ApolloProvider,
   createHttpLink,
+  split,
   from,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
@@ -30,14 +32,27 @@ const theme = createMuiTheme({
 //   credentials: "include",
 // });
 
-const uploadLink = createUploadLink({
-    uri: "http://localhost:5000/graphql",
-    credentials: "include",
-  })
+// const authToken = getAccessKey();
+
+const wsLink = new WebSocketLink({
+  uri: "ws://localhost:5000/subscriptions",
+  options: {
+    reconnect: true,
+    connectionParams: {
+      authorization: localStorage.getItem("habit")
+        ? `Bearer ${localStorage.getItem("habit")}`
+        : "",
+    },
+  },
+});
+
+let uploadLink = createUploadLink({
+  uri: "http://localhost:5000/graphql",
+  credentials: "include",
+});
 
 const authLink = setContext((_, { headers }) => {
   const token = getAccessKey();
-
   return {
     headers: {
       ...headers,
@@ -49,8 +64,8 @@ const authLink = setContext((_, { headers }) => {
 const tokenRefreshLink = new TokenRefreshLink({
   accessTokenField: "accessToken",
   isTokenValidOrUndefined: () => {
-    const token = getAccessKey();
 
+    const token = getAccessKey();
     if (!token) {
       return true;
     }
@@ -82,13 +97,28 @@ const tokenRefreshLink = new TokenRefreshLink({
   },
 });
 
+uploadLink = authLink.concat(uploadLink).concat(tokenRefreshLink);
+
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  },
+  wsLink,
+  uploadLink
+);
+
 const client = new ApolloClient({
-  link: from([
-    tokenRefreshLink,
-    authLink,
-    // httpLink,
-    uploadLink
-  ]),
+  // link: from([
+  //   tokenRefreshLink,
+  //   authLink,
+  //   // httpLink,
+  //   uploadLink
+  // ]),
+  link: splitLink,
   cache: new InMemoryCache(),
 });
 

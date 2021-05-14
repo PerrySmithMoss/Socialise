@@ -13,12 +13,13 @@ import { LeftNav } from "../../components/Home/LeftNav";
 import {
   useGetAllUserMessagesQuery,
   useGetAllMessagesFromUserQuery,
+  useNewMessageSubscription,
 } from "../../generated/graphql";
 import { Box, Divider } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
 import AddCommentIcon from "@material-ui/icons/AddComment";
-import { gql, useLazyQuery } from "@apollo/client";
+import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import { Message } from "./Message";
 import Button from "@material-ui/core/Button";
 
@@ -77,17 +78,33 @@ const GET_MESSAGES = gql`
   }
 `;
 
+// const newMessageSubscription = gql`
+//   subscription NewMessageSubscription {
+//     newMessage {
+//       id
+//       fromId
+//       toId
+//       content
+//       dateSent
+//     }
+//   }
+// `;
+
 export const MessagesList: React.FC<Props> = () => {
   const classes = useStyles();
   const { data: allMessages } = useGetAllUserMessagesQuery({
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
   });
   // const { data: getMessagesFromUser } = useGetAllMessagesFromUserQuery({ fetchPolicy: "network-only" });
 
   const [
     getAllMessagesFromUser,
-    { loading: messagesLoading, data: messagesData },
+    { loading: messagesLoading, data: messagesData},
   ] = useLazyQuery(GET_MESSAGES);
+
+  // const 
+  //   { loading, data, subscribeToMore}
+  //  = useQuery(GET_MESSAGES);
 
   const [selectedUserId, setSelectedUserId] = useState(null);
 
@@ -100,15 +117,27 @@ export const MessagesList: React.FC<Props> = () => {
           fromId: selectedUserId as any,
         },
       });
+      // subscribeToMore({
+      //   document: newMessageSubscription,
+      //   updateQuery: (prev: any, { subscriptionData }: any) => {
+      //     console.log("Prev: ", prev);
+      //     console.log("Subscription Data: ", subscriptionData);
 
+      //     if (!subscriptionData) {
+      //       return prev;
+      //     }
+
+      //     return prev
+      //   },
+      // });
       if (messagesData) {
         console.log(messagesData);
       }
     }
   }, [selectedUserId]);
 
-  console.log(allMessages);
-  console.log(messagesData);
+  // console.log(allMessages);
+  // console.log(messagesData);
   return (
     <>
       <Grid item className={classes.grid}>
@@ -174,7 +203,7 @@ export const MessagesList: React.FC<Props> = () => {
         <Message messagesData={messagesData} selectedUserId={selectedUserId}/>
       ) : (
         <Grid item className={classes.grid}>
-          <div className={classes.test}>
+          <div className={classes.test}> 
             <Box
               width={430}
               display="flex"

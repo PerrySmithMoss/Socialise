@@ -89,6 +89,7 @@ export const ListOfPosts: React.FC = () => {
   return (
     <div>
       {data.getAllPosts.map((post: any) => (
+        <div key={post.id}>
         <List className={classes.list}>
           <ListItem
           key={post.id}
@@ -172,6 +173,7 @@ export const ListOfPosts: React.FC = () => {
           </Box>
           <Divider variant="inset" component="li" />
         </List>
+        </div>
       ))}
     </div>
   );

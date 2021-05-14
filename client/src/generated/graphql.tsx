@@ -66,7 +66,7 @@ export type Mutation = {
   revokeRefreshTokensForUser: Scalars['Boolean'];
   loginUser: LoginResponse;
   registerUser: Scalars['Boolean'];
-  sendMessage: Scalars['Boolean'];
+  sendMessage: Message;
   createPost: Scalars['Boolean'];
   deletePost: Scalars['Boolean'];
   likePost: Scalars['Boolean'];
@@ -199,6 +199,11 @@ export type QueryGetSpecificUserInfoArgs = {
 
 export type QueryGetAllMessagesFromUserArgs = {
   fromId: Scalars['Int'];
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  newMessage: Message;
 };
 
 
@@ -489,6 +494,17 @@ export type LoginMutation = (
   ) }
 );
 
+export type NewMessageSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NewMessageSubscription = (
+  { __typename?: 'Subscription' }
+  & { newMessage: (
+    { __typename?: 'Message' }
+    & Pick<Message, 'id' | 'fromId' | 'toId' | 'content' | 'dateSent'>
+  ) }
+);
+
 export type RegisterMutationVariables = Exact<{
   email: Scalars['String'];
   firstName: Scalars['String'];
@@ -512,7 +528,10 @@ export type SendMessageMutationVariables = Exact<{
 
 export type SendMessageMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Mutation, 'sendMessage'>
+  & { sendMessage: (
+    { __typename?: 'Message' }
+    & Pick<Message, 'id' | 'fromId' | 'toId' | 'dateSent' | 'content'>
+  ) }
 );
 
 export type UpdateUserProfileMutationVariables = Exact<{
@@ -1236,6 +1255,39 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const NewMessageDocument = gql`
+    subscription NewMessage {
+  newMessage {
+    id
+    fromId
+    toId
+    content
+    dateSent
+  }
+}
+    `;
+
+/**
+ * __useNewMessageSubscription__
+ *
+ * To run a query within a React component, call `useNewMessageSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useNewMessageSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewMessageSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewMessageSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewMessageSubscription, NewMessageSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<NewMessageSubscription, NewMessageSubscriptionVariables>(NewMessageDocument, options);
+      }
+export type NewMessageSubscriptionHookResult = ReturnType<typeof useNewMessageSubscription>;
+export type NewMessageSubscriptionResult = Apollo.SubscriptionResult<NewMessageSubscription>;
 export const RegisterDocument = gql`
     mutation Register($email: String!, $firstName: String!, $lastName: String!, $username: String!, $password: String!) {
   registerUser(
@@ -1279,7 +1331,13 @@ export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const SendMessageDocument = gql`
     mutation SendMessage($toId: Int!, $dateSent: DateTime!, $content: String!) {
-  sendMessage(toId: $toId, dateSent: $dateSent, content: $content)
+  sendMessage(toId: $toId, dateSent: $dateSent, content: $content) {
+    id
+    fromId
+    toId
+    dateSent
+    content
+  }
 }
     `;
 export type SendMessageMutationFn = Apollo.MutationFunction<SendMessageMutation, SendMessageMutationVariables>;

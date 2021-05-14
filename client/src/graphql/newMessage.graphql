@@ -1,0 +1,9 @@
+subscription NewMessage {
+  newMessage{
+    id
+    fromId
+    toId
+    content
+    dateSent
+  }
+}

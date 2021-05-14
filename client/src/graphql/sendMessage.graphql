@@ -1,3 +1,9 @@
 mutation SendMessage($toId: Int!, $dateSent: DateTime!, $content: String!) {
-  sendMessage(toId: $toId, dateSent: $dateSent, content: $content)
+  sendMessage(toId: $toId, dateSent: $dateSent, content: $content) {
+    id
+    fromId
+    toId
+    dateSent
+    content
+  }
 }

@@ -54,15 +54,8 @@ export class MessageResolver {
         order: {
           dateSent: "DESC",
         },
+        take: 1
       });
-
-      // users = users.map(otherUser => {
-      //   const latestMessage = allUserMessages.find(
-      //     m => m.fromId === otherUser.id || m.to === otherUser.id
-      //   )
-      //   otherUser
-      // })
-      // console.log(messagesFromUser);
 
       return allUserMessages;
     } catch (err) {
@@ -120,21 +113,21 @@ export class MessageResolver {
   }
 
   @Mutation(() => Message)
-  // @UseMiddleware(isAuth)
+  @UseMiddleware(isAuth)
   async sendMessage(
     @Arg("toId", () => Int) toId: number,
     @Arg("dateSent") dateSent: Date,
     @Arg("content", () => String) content: string,
-    @PubSub() pubsub: PubSubEngine
-    // @Ctx() context: MyContext
+    @PubSub() pubsub: PubSubEngine,
+    @Ctx() context: MyContext
   ) {
-    // const authorization = context.req.headers["authorization"];
-    // console.log(authorization);
+    const authorization = context.req.headers["authorization"];
+    console.log(authorization);
     try {
-      // const token = authorization!.split(" ")[1];
-      // const payload: any = verify(token, process.env.ACCESS_KEY!);
-      // const userId = payload.userId;
-      // console.log("Your user id is:" + payload.userId);
+      const token = authorization!.split(" ")[1];
+      const payload: any = verify(token, process.env.ACCESS_KEY!);
+      const userId = payload.userId;
+      console.log("Your user id is:" + payload.userId);
 
       const recipient = await Users.findOne({ where: { id: toId } });
 
@@ -146,20 +139,14 @@ export class MessageResolver {
         throw new Error("Message is empty...");
       }
 
-      await Message.insert({
-        fromId: 18,
+      const sentMessage = await Message.create
+      ({
+        fromId: userId,
         toId: toId,
         dateSent: dateSent,
         content: content,
-      });
-
-      const sentMessage = {
-        fromId: 18,
-        toId: toId,
-        dateSent: dateSent,
-        content: content,
-      };
-
+      }).save();
+      
       // console.log(sentMessage)
       pubsub.publish("NEW_MESSAGE", sentMessage );
 
@@ -171,7 +158,10 @@ export class MessageResolver {
     // return true;
   }
 
-  @Subscription({ topics: "NEW_MESSAGE" })
+  @Subscription({ 
+    topics: "NEW_MESSAGE",
+    // filter: ({payload, args}) => payload.toId === args.toId ? true : false
+  })
   newMessage(@Root() sentMessage: Message): Message {
     return sentMessage;
   }

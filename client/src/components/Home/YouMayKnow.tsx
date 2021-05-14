@@ -43,7 +43,7 @@ export const YouMayKnow: React.FC = () => {
       <Divider />
       <List dense className={classes.root}>
         {data.getAllUsers.map((user: any) => (
-          <div>
+          <div key={user.id}>
             <ListItem key={user.id} button>
               <ListItemAvatar>
                 <Avatar />
