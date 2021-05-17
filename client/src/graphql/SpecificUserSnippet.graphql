@@ -1,28 +1,24 @@
-query GetSpecificUserInfo($userId: Int!) {
-  getSpecificUserInfo(userId: $userId) {
+fragment SpecifcUserSnippet on Users {
     id
-    firstName
-    lastName
-    username
-    followingCount
     followersCount
+    followingCount
+    username
     following {
       id
       username
       followerId
       followingId
     }
-    follower {
+    follower{
       id
       username
       followerId
       followingId
     }
-    profile {
+    profile{
       avatar
-      bio
-      location
       website
+      location
+      bio
     }
-  }
 }

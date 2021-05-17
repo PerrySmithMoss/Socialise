@@ -1,17 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { Box, Button, Divider, Modal } from "@material-ui/core";
 import Avatar from "@material-ui/core/Avatar";
 import ProfileBanner from "../../img/profile-banner.jpg";
-import { useGetCurrentUserQuery } from "../../generated/graphql";
+import {
+  GetCurrentUserDocument,
+  GetSpecificUserInfoDocument,
+  useFollowUserMutation,
+  useGetCurrentUserQuery,
+  useGetSpecificUserInfoQuery,
+} from "../../generated/graphql";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import IconButton from "@material-ui/core/IconButton";
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { EditProfile } from "./EditProfile";
-import { Link } from "react-router-dom";
-import { useHistory } from 'react-router-dom';
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+// import { EditProfile } from "./EditProfile";
+import { Link, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
+import { FollowUser } from "./FollowUser";
+import CloseIcon from "@material-ui/icons/Close";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,9 +40,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     content: {
       position: "relative",
-      // margin-top: auto;
-      backgroundImage: `url(${ProfileHeader})`,
-      /* padding-top:200px; */
+      //   backgroundImage: `url(${ProfileHeader})`,
       height: 150,
       width: "100%",
       display: "block",
@@ -68,14 +74,25 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface Props {}
+interface Props {
+  location: any;
+}
 
-export const ProfileHeader: React.FC<Props> = () => {
+export const SingleUserHeader: React.FC<Props> = ({ location }) => {
   const classes = useStyles();
-  const { data } = useGetCurrentUserQuery({ fetchPolicy: "cache-first" });
+  let { state } = useLocation();
+  const { data } = useGetSpecificUserInfoQuery({
+    fetchPolicy: "network-only",
+    variables: { userId: location.state.post.user.id },
+  });
+  const [followUser] = useFollowUserMutation();
   const [value, setValue] = React.useState(0);
   const [open, setOpen] = React.useState(false);
   const history = useHistory();
+
+  useEffect(() => {
+    console.log(data);
+  });
 
   const handleOpen = () => {
     setOpen(true);
@@ -93,12 +110,16 @@ export const ProfileHeader: React.FC<Props> = () => {
     <div className={classes.root}>
       <Box display="flex" pl={2} bgcolor="background.paper">
         <Box mt={1}>
-          <IconButton onClick={() => history.goBack()} style={{ color: "#14ffec", paddingTop: "15px" }} aria-label="delete">
+          <IconButton
+            onClick={() => history.goBack()}
+            style={{ color: "#14ffec", paddingTop: "15px" }}
+            aria-label="delete"
+          >
             <ArrowBackIcon fontSize="small" />
           </IconButton>
         </Box>
         <Box>
-          <h2>{`${data.getCurrentUser?.firstName} ${data.getCurrentUser?.lastName}`}</h2>
+          <h2>{`${data.getSpecificUserInfo?.firstName} ${data.getSpecificUserInfo?.lastName}`}</h2>
         </Box>
       </Box>
       <Box bgcolor="background.paper">
@@ -128,40 +149,24 @@ export const ProfileHeader: React.FC<Props> = () => {
               style={{ position: "absolute", display: "block", top: "22.5%" }}
               className={classes.avatar}
               alt="Remy Sharp"
-              src={data.getCurrentUser?.profile.avatar as string}
+              src={data.getSpecificUserInfo?.profile.avatar as string}
             />
           </Box>
-          <Box style={{ marginTop: "20px", paddingBottom: "25px" }}>
-            <Button
-              onClick={handleOpen}
-              variant="contained"
-              size="medium"
-              color="primary"
-              style={{
-                backgroundColor: "0d7377",
-                borderRadius: 50,
-                color: "white",
-                paddingLeft: "20px",
-                paddingRight: "20px",
-              }}
-            >
-              Edit Profile
-            </Button>
-          </Box>
+            <FollowUser specificUser={data.getSpecificUserInfo}/>
         </Box>
         <Box pl={2} bgcolor="background.paper">
           <Box pb={0.2} flexGrow={1}>
             <span
               style={{ fontWeight: "bolder" }}
-            >{`${data.getCurrentUser?.firstName}  ${data.getCurrentUser?.lastName}`}</span>
+            >{`${data.getSpecificUserInfo?.firstName}  ${data.getSpecificUserInfo?.lastName}`}</span>
           </Box>
 
           <Box pb={1} flexGrow={1}>
-            <span>@{data.getCurrentUser?.username}</span>
+            <span>@{data.getSpecificUserInfo?.username}</span>
           </Box>
 
           <Box pb={3} flexGrow={1}>
-            <span>{data.getCurrentUser?.profile.bio}</span>
+            <span>{data.getSpecificUserInfo?.profile.bio}</span>
           </Box>
         </Box>
 
@@ -173,10 +178,10 @@ export const ProfileHeader: React.FC<Props> = () => {
         >
           <Box flexGrow={1}>
             <span style={{ paddingRight: "15px", textDecoration: "none" }}>
-              {data.getCurrentUser?.profile.location}{" "}
+              {data.getSpecificUserInfo?.profile.location}{" "}
             </span>
             <Link
-              to={data.getCurrentUser?.profile.website as string}
+              to={data.getSpecificUserInfo?.profile.website as string}
               style={{
                 paddingRight: "15px",
                 textDecoration: "none",
@@ -184,7 +189,7 @@ export const ProfileHeader: React.FC<Props> = () => {
               }}
             >
               {" "}
-              {data.getCurrentUser?.profile.website}{" "}
+              {data.getSpecificUserInfo?.profile.website}{" "}
             </Link>
             <span> Joined</span>
           </Box>
@@ -199,11 +204,11 @@ export const ProfileHeader: React.FC<Props> = () => {
         >
           <Box flexGrow={1}>
             <span style={{ fontWeight: "bold" }}>
-              {data.getCurrentUser?.followingCount}{" "}
+              {data.getSpecificUserInfo?.followingCount}{" "}
             </span>
             <span style={{ paddingRight: "15px" }}> Following </span>
             <span style={{ fontWeight: "bold" }}>
-              {data.getCurrentUser?.followersCount}{" "}
+              {data.getSpecificUserInfo?.followersCount}{" "}
             </span>
             <span> Followers</span>
           </Box>
@@ -223,7 +228,7 @@ export const ProfileHeader: React.FC<Props> = () => {
         </Box>
         <br></br>
       </Box>
-      <EditProfile open={open} setOpen={setOpen} />
+      {/* <FollowUser open={open} setOpen={setOpen} /> */}
     </div>
   );
 };

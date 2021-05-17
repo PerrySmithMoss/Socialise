@@ -1,0 +1,11 @@
+mutation FollowUser(
+  $username: String!
+  $followingId: Int!
+  $value: Int!
+) {
+  followUser(
+    username: $username
+    followingId: $followingId
+    value: $value
+  )
+}

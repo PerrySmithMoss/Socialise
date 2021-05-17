@@ -23,6 +23,7 @@ import { Profile } from "../../Entities/Profile";
 import { Users } from "../../Entities/Users";
 import { MyContext } from "../../Types/MyContext";
 import { GraphQLUpload, FileUpload } from "graphql-upload";
+import { Following } from "../../Entities/Following";
 
 @InputType()
 class ProfileUpdateInput {
@@ -73,9 +74,11 @@ export class UserResolver {
   }
 
   @Query(() => Users)
-  @UseMiddleware(isAuth)
+  // @UseMiddleware(isAuth)
   async getSpecificUserInfo(@Arg("userId", () => Int) userId: number) {
-    return await Users.findOne(userId, { relations: ["profile"] });
+    return await Users.findOne(userId, {
+      relations: ["profile", "following", "follower"],
+    });
   }
 
   @Query(() => Users, { nullable: true })
@@ -95,7 +98,9 @@ export class UserResolver {
 
       // const user = await Users.findOne(16, {relations: ["profile"]})
       // console.log(user)
-      return await Users.findOne(payload.userId, { relations: ["profile"] });
+      return await Users.findOne(payload.userId, {
+        relations: ["profile", "following", "follower"],
+      });
 
       // const qb = getConnection()
       // .getRepository(Users)
@@ -239,6 +244,127 @@ export class UserResolver {
       });
 
       console.log("User: ", user);
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async followUserV2(
+    @Arg("username", () => String) username: string,
+    @Arg("followingId", () => Int) followingId: number,
+    @Ctx() context: MyContext
+  ) {
+    const authorization = context.req.headers["authorization"];
+    console.log(authorization);
+    try {
+      const token = authorization!.split(" ")[1];
+      const payload: any = verify(token, process.env.ACCESS_KEY!);
+      const userId = payload.userId;
+
+      const userToFollow = await Users.findOne({ where: { id: followingId } });
+
+      if (!userToFollow) {
+        throw new Error("User not found to follow...");
+      }
+
+      await Following.insert({
+        username: username,
+        followingId: followingId,
+        followerId: userId,
+      });
+
+      // console.log(sentMessage)
+
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async followUser(
+    @Arg("username", () => String) username: string,
+    @Arg("followingId", () => Int) followingId: number,
+    @Arg("value", () => Int) value: number,
+    @Ctx() context: MyContext
+  ) {
+    const authorization = context.req.headers["authorization"];
+
+    try {
+      const token = authorization!.split(" ")[1];
+      const payload: any = verify(token, process.env.ACCESS_KEY!);
+      const userId = payload.userId;
+
+      const isFollowing = value !== -1;
+      console.log("isFollowing: ", isFollowing);
+      const realValue = isFollowing ? 1 : -1;
+      console.log("realValue: ", realValue);
+
+      const followedUser = await Following.findOne({
+        where: { followingId: followingId, followerId: userId },
+      });
+
+      // Unfollowing a user
+      if (followedUser) {
+        console.log("User has already followed the user before");
+        await getConnection().transaction(async (trns) => {
+          await trns.query(
+            `
+            DELETE FROM following
+            WHERE followingId = ${followingId} AND followerId = ${userId}
+            `
+          );
+          // Decrement the user's followersCount of the user to be un-followed
+          await trns.query(
+            `
+            UPDATE users
+            SET followersCount = followersCount - 1
+            WHERE id = ${followingId}
+            `
+          );
+          // Decrement the user's followingCount of the user who is un-following
+          await trns.query(
+            `
+            UPDATE users
+            SET followingCount = followersCount - 1
+            WHERE id = ${userId}
+            `
+          );
+        });
+      } else if (!followedUser) {
+        // Following a user
+        await getConnection().transaction(async (trns) => {
+          console.log("User has not followed the user before");
+          await trns.query(
+            `
+            INSERT INTO following (username, followingId, followerId, value)
+            VALUES ("${username}", ${followingId}, ${userId}, ${realValue});
+            `
+          );
+          // Increment the user's followersCount of the user to be followed
+          await trns.query(
+            `
+            UPDATE users 
+            SET followersCount = followersCount + ${realValue}
+            WHERE id = ${followingId};
+            `
+          );
+          // Increment the user's followingCount of the user who is following
+          await trns.query(
+            `
+            UPDATE users 
+            SET followingCount = followingCount + ${realValue}
+            WHERE id = ${userId};
+            `
+          );
+        });
+      }
     } catch (err) {
       console.log(err);
       return false;

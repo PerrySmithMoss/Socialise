@@ -19,13 +19,16 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import PersonPinCircleIcon from "@material-ui/icons/PersonPinCircle";
 import ListIcon from "@material-ui/icons/List";
 import moment from "moment";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { LikeButton } from "../components/Post/LikeButton";
-import { useDeletePostMutation, useGetCurrentUserQuery } from "../generated/graphql";
-import {useLocation} from "react-router-dom";
-import TimelineIcon from '@material-ui/icons/Timeline';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { useHistory } from 'react-router-dom';
+import {
+  useDeletePostMutation,
+  useGetCurrentUserQuery,
+} from "../generated/graphql";
+import { useLocation } from "react-router-dom";
+import TimelineIcon from "@material-ui/icons/Timeline";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -37,17 +40,23 @@ const useStyles = makeStyles((theme: Theme) =>
       width: 300,
     },
     grid: {
-      marginTop: 25
+      marginTop: 25,
     },
     list: {
       width: 500,
       backgroundColor: theme.palette.background.paper,
     },
+    link: {
+      textDecoration: "none",
+      "&:hover": {
+        color: "#14ffec",
+      },
+    },
   })
 );
 
 interface Props {
-  location : any
+  location: any;
 }
 
 export const Post: React.FC<Props> = ({ location }) => {
@@ -55,7 +64,9 @@ export const Post: React.FC<Props> = ({ location }) => {
   const classes = useStyles();
   let { state } = useLocation();
   const history = useHistory();
-  const { data: currentUser, loading } = useGetCurrentUserQuery({ fetchPolicy: "cache-first" });
+  const { data: currentUser, loading } = useGetCurrentUserQuery({
+    fetchPolicy: "cache-first",
+  });
   const [deletePost] = useDeletePostMutation();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -64,8 +75,8 @@ export const Post: React.FC<Props> = ({ location }) => {
   };
 
   useEffect(() => {
-    console.log(state)
-  })
+    console.log(state);
+  });
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -73,134 +84,178 @@ export const Post: React.FC<Props> = ({ location }) => {
   // if (!data) {
   //   return <div>Loading...</div>;
   // }
-  
+
   return (
     <Grid container className={classes.root} spacing={2}>
       <Grid item xs={12}>
         <Grid container justify="center" spacing={spacing}>
           <Grid item className={classes.grid}>
-        <LeftNav />
+            <LeftNav />
           </Grid>
 
           <Grid item className={classes.grid}>
-          <Box display="flex" pl={2} bgcolor="background.paper">
-          <Box mt={1}>
-          <IconButton onClick={() => history.goBack()} style={{ color: "#14ffec" }} aria-label="delete">
-            <ArrowBackIcon />
-          </IconButton>
-        </Box>
-        <Box flexGrow={1}>
-          <h2>Thread</h2>
-        </Box>
-      </Box>
-      <Divider />
-          <List className={classes.list}>
-          <ListItem
-          key={location.state.post.id}
-          button
-            // component={Link}
-            // to={{ pathname: `/post/${location.state.post.id}` }}
-            alignItems="flex-start"
-          >
-            <ListItemAvatar>
-              <Avatar alt="Remy Sharp" src={location.state.post.user.profile.avatar} />
-            </ListItemAvatar>
-            <ListItemText style={{textDecoration: "none"}}
-              primary={
-                <Typography variant="h6" style={{ fontSize: "16px", color: 'white' }}>{`${location.state.post.firstName}${location.state.post.lastName} @${
-                  location.state.post.userName
-                } 
-              - ${moment(location.state.post.datePublished).fromNow()}`}</Typography>
-              }
-              secondary={<React.Fragment>{`${location.state.post.content}`}</React.Fragment>}
-            />
-  
-          </ListItem>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            textAlign="center"
-            p={1}
-            bgcolor="background.paper"
-          >
-            <Box flexGrow={1}>
-              <IconButton aria-label="settings">
-                <ModeCommentIcon fontSize="small" />
-              </IconButton>
-              <span>{location.state.post.commentsCount}</span>
+            <Box display="flex" pl={2} bgcolor="background.paper">
+              <Box mt={1}>
+                <IconButton
+                  onClick={() => history.goBack()}
+                  style={{ color: "#14ffec" }}
+                  aria-label="delete"
+                >
+                  <ArrowBackIcon />
+                </IconButton>
+              </Box>
+              <Box flexGrow={1}>
+                <h2>Thread</h2>
+              </Box>
             </Box>
-            <Box flexGrow={1}>
-              <IconButton aria-label="settings">
-                <SwapVertIcon />
-              </IconButton>
-              <span>2</span>
-            </Box>
-            <LikeButton currentUser={currentUser} post={location.state.post} />
-            <Box flexGrow={1}>
-            <IconButton
-              aria-label="settings"
-              aria-controls="simple-menu"
-              aria-haspopup="true"
-              onClick={handleClick}
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              id="simple-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              <MenuItem
-                style={{ color: "red" }}
-                // onClick={async () => {
-                //   await deletePost({
-                //     variables: { postID: post.postID },
-                //     refetchQueries: [{ query: GetAllPostsDocument }],
-                //   });
-                // }}
-              >
-                Delete post <DeleteIcon />
-              </MenuItem>
-              <Divider></Divider>
-              <MenuItem onClick={handleClose}>
-                Pin to your timeline <PersonPinCircleIcon />
-              </MenuItem>
-              <Divider></Divider>
-              <MenuItem onClick={handleClose}>
-                Add/remove from your list <ListIcon />
-              </MenuItem>
-            </Menu>
-            </Box>
-          </Box>
-          <Divider variant="inset" component="li" />
-          <br></br>
-          {location.state.post.comments && location.state.post.comments.map(
-            (comment: any) => (
-              <div>
+            <Divider />
+            <List className={classes.list}>
               <ListItem
-              key={location.state.post.id}
-              button
+                key={location.state.post.id}
+                // button
                 // component={Link}
                 // to={{ pathname: `/post/${location.state.post.id}` }}
                 alignItems="flex-start"
               >
-                <ListItemAvatar>
-                  <Avatar alt="Remy Sharp" src={comment.user.profile.avatar} />
-                </ListItemAvatar>
-                <ListItemText style={{textDecoration: "none"}}
+                <NavLink to="users/profile" activeStyle={{ color: "#14ffec" }}>
+                  <ListItemAvatar>
+                    <Avatar
+                      alt="Remy Sharp"
+                      src={location.state.post.user.profile.avatar}
+                    />
+                  </ListItemAvatar>
+                </NavLink>
+                <ListItemText
+                  style={{ textDecoration: "none" }}
                   primary={
-                    <Typography variant="h6" style={{ fontSize: "16px", color: 'white' }}>{`${comment.user.firstName}${comment.user.lastName} @${
-                    comment.user.username
-                    } 
-                  - ${moment(comment.datePublished).fromNow()}`}</Typography>
+                    <NavLink
+                      to="users/profile"
+                      activeStyle={{ color: "#14ffec" }}
+                      style={{ textDecoration: "none" }}
+                    >
+                      <Typography
+                        variant="h6"
+                        style={{ fontSize: "16px", color: "white" }}
+                      >{`${location.state.post.firstName}${
+                        location.state.post.lastName
+                      } @${location.state.post.userName} 
+              - ${moment(
+                location.state.post.datePublished
+              ).fromNow()}`}</Typography>
+                    </NavLink>
                   }
-                  secondary={<React.Fragment>{`${comment.comment}`}</React.Fragment>}
+                  secondary={
+                    <React.Fragment>{`${location.state.post.content}`}</React.Fragment>
+                  }
                 />
-      
               </ListItem>
-              {/* <Box
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                textAlign="center"
+                p={1}
+                bgcolor="background.paper"
+              >
+                <Box flexGrow={1}>
+                  <IconButton aria-label="settings">
+                    <ModeCommentIcon fontSize="small" />
+                  </IconButton>
+                  <span>{location.state.post.commentsCount}</span>
+                </Box>
+                <Box flexGrow={1}>
+                  <IconButton aria-label="settings">
+                    <SwapVertIcon />
+                  </IconButton>
+                  <span>2</span>
+                </Box>
+                <LikeButton
+                  currentUser={currentUser}
+                  post={location.state.post}
+                />
+                <Box flexGrow={1}>
+                  <IconButton
+                    aria-label="settings"
+                    aria-controls="simple-menu"
+                    aria-haspopup="true"
+                    onClick={handleClick}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    id="simple-menu"
+                    anchorEl={anchorEl}
+                    keepMounted
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                  >
+                    <MenuItem
+                      style={{ color: "red" }}
+                      // onClick={async () => {
+                      //   await deletePost({
+                      //     variables: { postID: post.postID },
+                      //     refetchQueries: [{ query: GetAllPostsDocument }],
+                      //   });
+                      // }}
+                    >
+                      Delete post <DeleteIcon />
+                    </MenuItem>
+                    <Divider></Divider>
+                    <MenuItem onClick={handleClose}>
+                      Pin to your timeline <PersonPinCircleIcon />
+                    </MenuItem>
+                    <Divider></Divider>
+                    <MenuItem onClick={handleClose}>
+                      Add/remove from your list <ListIcon />
+                    </MenuItem>
+                  </Menu>
+                </Box>
+              </Box>
+              <Divider variant="inset" component="li" />
+              <br></br>
+              {location.state.post.comments &&
+                location.state.post.comments.map((comment: any) => (
+                  <div>
+                    <ListItem
+                      key={location.state.post.id}
+                      // component={Link}
+                      // to={{ pathname: `/post/${location.state.post.id}` }}
+                      alignItems="flex-start"
+                    >
+                      <NavLink
+                        to="/users/profile"
+                        activeStyle={{ color: "#14ffec" }}
+                        style={{ textDecoration: "none" }}
+                      >
+                        <ListItemAvatar>
+                          <Avatar
+                            alt="Remy Sharp"
+                            src={comment.user.profile.avatar}
+                          />
+                        </ListItemAvatar>
+                      </NavLink>
+                      <NavLink
+                        to="users/profile"
+                        activeStyle={{ color: "#14ffec" }}
+                        style={{ textDecoration: "none" }}
+                      >
+                        <ListItemText
+                          style={{ textDecoration: "none" }}
+                          primary={
+                            <Typography
+                              variant="h6"
+                              style={{ fontSize: "16px", color: "white" }}
+                            >{`${comment.user.firstName}${
+                              comment.user.lastName
+                            } @${comment.user.username} 
+                  - ${moment(comment.datePublished).fromNow()}`}</Typography>
+                          }
+                          secondary={
+                            <React.Fragment>{`${comment.comment}`}</React.Fragment>
+                          }
+                        />
+                      </NavLink>
+                    </ListItem>
+                    {/* <Box
                 display="flex"
                 justifyContent="space-between"
                 textAlign="center"
@@ -258,13 +313,11 @@ export const Post: React.FC<Props> = ({ location }) => {
                 </Menu>
                 </Box>
               </Box> */}
-              <br></br>
-          <Divider variant="inset" component="li" />
-
-              </div>
-            )
-          )}
-        </List>
+                    <br></br>
+                    <Divider variant="inset" component="li" />
+                  </div>
+                ))}
+            </List>
           </Grid>
 
           <Grid item className={classes.grid}>

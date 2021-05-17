@@ -5,8 +5,20 @@ query GetCurrentUser {
     lastName
     email
     username
-    followers
-    following
+    followersCount
+    followingCount
+    following {
+      id
+      username
+      followerId
+      followingId
+    }
+    follower {
+      id
+      username
+      followerId
+      followingId
+    }
     profile {
       id
       bio

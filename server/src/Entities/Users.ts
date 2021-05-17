@@ -13,6 +13,7 @@ import { Profile } from "./Profile";
 import { LikedPost } from "./LikedPost";
 import { Comment } from "./Comment"
 import { Message } from "./Message"
+import { Following } from "./Following"
 
 @ObjectType()
 @Entity("users")
@@ -47,11 +48,11 @@ export class Users extends BaseEntity {
 
   @Field(() => Int)
   @Column("int", { default: 0 })
-  followers!: number;
+  followersCount!: number;
 
   @Field(() => Int)
   @Column("int", { default: 0 })
-  following!: number;
+  followingCount!: number;
 
   @Field(() => Int)
   @Column({ nullable: true })
@@ -74,6 +75,20 @@ export class Users extends BaseEntity {
 
   @OneToMany(() => Message, (message) => message.to)
   to: Message[];
+
+  @OneToMany(() => Following, (following) => following.following, {
+    cascade: true
+  })
+  @JoinColumn()
+  @Field(() => [Following])
+  follower: Following[];
+
+  @OneToMany(() => Following, (following) => following.follower, {
+    cascade: true
+  })
+  @JoinColumn()
+  @Field(() => [Following])
+  following: Following[];
 
   @OneToOne(() => Profile, {
     cascade: true,

@@ -17,19 +17,27 @@ import { LikedPost } from "../../Entities/LikedPost";
 import { Post } from "../../Entities/Post";
 import { Users } from "../../Entities/Users";
 import { MyContext } from "../../Types/MyContext";
-import { Comment } from "../../Entities/Comment"
+import { Comment } from "../../Entities/Comment";
 
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
   async getAllPosts() {
-    const posts = await Post.find({relations: ['likes', 'user', 'user.profile', 'comments', 'comments.user', 'comments.user.profile'],
+    const posts = await Post.find({
+      relations: [
+        "likes",
+        "user",
+        "user.profile",
+        "comments",
+        "comments.user",
+        "comments.user.profile",
+      ],
       order: {
         datePublished: "DESC",
       },
     });
     // console.log(posts)
-    return posts
+    return posts;
   }
 
   @Query(() => [Post])
@@ -56,15 +64,50 @@ export class PostResolver {
       //   .orderBy("p.datePublished", "DESC");
 
       // const posts = await qb.getMany();
-     const userPosts = await Post.find({relations: ['likes', 'user', 'user.profile', 'comments', 'comments.user', 'comments.user.profile'],
-     where: {
-      userId: userId
-     },
-     order: {
-      datePublished: "DESC",
-    },
-  });
-    console.log(userPosts)
+      const userPosts = await Post.find({
+        relations: [
+          "likes",
+          "user",
+          "user.profile",
+          "comments",
+          "comments.user",
+          "comments.user.profile",
+        ],
+        where: {
+          userId: userId,
+        },
+        order: {
+          datePublished: "DESC",
+        },
+      });
+      console.log(userPosts);
+
+      return userPosts;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
+  @Query(() => [Post])
+  async getAllSpecificUserPosts(@Arg("userId", () => Int) userId: number) {
+    try {
+      const userPosts = await Post.find({
+        relations: [
+          "likes",
+          "user",
+          "user.profile",
+          "comments",
+          "comments.user",
+          "comments.user.profile",
+        ],
+        where: {
+          userId: userId,
+        },
+        order: {
+          datePublished: "DESC",
+        },
+      });
 
       return userPosts;
     } catch (e) {
@@ -142,7 +185,7 @@ export class PostResolver {
 
       // the user has liked the post before
       if (likedPost) {
-        console.log("User has already liked the post before")
+        console.log("User has already liked the post before");
         await getConnection().transaction(async (trns) => {
           await trns.query(
             `
@@ -161,7 +204,7 @@ export class PostResolver {
       } else if (!likedPost) {
         // user has not liked post
         await getConnection().transaction(async (trns) => {
-        console.log("User has not liked the post before")
+          console.log("User has not liked the post before");
           await trns.query(
             `
             INSERT INTO liked_posts (userId, postId, value)
@@ -201,42 +244,41 @@ export class PostResolver {
       const userId = payload.userId;
       console.log("Your user id is:" + payload.userId);
 
-    //   await getConnection().transaction(async (trns) => {
-    //       await trns.query(
-    //         `
-    //         INSERT INTO comments (userId, postId, comment)
-    //         VALUES (${userId}, ${postId}, ${comment});
-    //         `
-    //       );
-    //       await trns.query(
-    //         `
-    //         UPDATE posts 
-    //         SET commentsCount = commentsCount + 1
-    //         WHERE id = ${postId};
-    //         `
-    //       );
-    // });
+      //   await getConnection().transaction(async (trns) => {
+      //       await trns.query(
+      //         `
+      //         INSERT INTO comments (userId, postId, comment)
+      //         VALUES (${userId}, ${postId}, ${comment});
+      //         `
+      //       );
+      //       await trns.query(
+      //         `
+      //         UPDATE posts
+      //         SET commentsCount = commentsCount + 1
+      //         WHERE id = ${postId};
+      //         `
+      //       );
+      // });
 
-        // const post = await Post.findOne({
-        //   where: { postId },
-        // });
-        // await Post.update({id: postId}, commen)
+      // const post = await Post.findOne({
+      //   where: { postId },
+      // });
+      // await Post.update({id: postId}, commen)
 
-        await Comment.insert({
-          userId: userId,
-          postId: postId,
-          comment: comment,
-          datePublished: datePublished
-        });
+      await Comment.insert({
+        userId: userId,
+        postId: postId,
+        comment: comment,
+        datePublished: datePublished,
+      });
 
-        await getConnection().query(
-          `
+      await getConnection().query(
+        `
           UPDATE posts 
           SET commentsCount = commentsCount + 1
           WHERE id = ${postId};
           `
-        )
-    
+      );
     } catch (err) {
       console.log(err);
       return false;

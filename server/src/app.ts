@@ -20,6 +20,7 @@ import { Comment } from "./Entities/Comment";
 import { Message } from "./Entities/Message";
 
 import http from "http";
+import { Following } from "./Entities/Following";
 
 const main = async () => {
   const app: Application = express();
@@ -42,8 +43,8 @@ const main = async () => {
     username: `${process.env.USERNAME}`,
     password: `${process.env.PASSWORD}`,
     logging: true,
-    synchronize: false,
-    entities: [Users, Post, Profile, LikedPost, Comment, Message],
+    synchronize: true,
+    entities: [Users, Post, Profile, LikedPost, Comment, Message, Following],
   });
 
   app.post("/refresh_token", async (req: Request, res: Response) => {
@@ -84,8 +85,8 @@ const main = async () => {
     context: ({ req, res }) => ({ req, res }),
     subscriptions: {
       path: "/subscriptions",
-      onConnect: () => console.log("Client connected for subscriptions"),
-      onDisconnect: () => console.log("Client disconnected from subscriptions")
+      onConnect: () => console.log("✅  Client connected for subscriptions"),
+      onDisconnect: () => console.log("❌  Client disconnected from subscriptions")
     },
     uploads: false,
   });
@@ -101,9 +102,9 @@ const main = async () => {
 
   const PORT = process.env.APP_PORT || 5000;
   httpServer.listen(PORT, () => { 
-    console.log(`🚀 Server running on http://localhost:${PORT}`)
+    console.log(`🚀  Server running on http://localhost:${PORT}`)
     console.log(
-      `🚀 Subscriptions ready at ws://localhost:${PORT}${apolloServer.subscriptionsPath}`,
+      `🚀  Subscriptions ready at ws://localhost:${PORT}${apolloServer.subscriptionsPath}`,
     );
     });
 

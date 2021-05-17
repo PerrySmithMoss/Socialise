@@ -28,6 +28,16 @@ export type Comment = {
 };
 
 
+export type Following = {
+  __typename?: 'Following';
+  id: Scalars['Int'];
+  username: Scalars['String'];
+  followingId: Scalars['Int'];
+  follower: Users;
+  followerId: Scalars['Int'];
+  following: Users;
+};
+
 export type ImageUploadResponse = {
   __typename?: 'ImageUploadResponse';
   url: Scalars['String'];
@@ -66,6 +76,8 @@ export type Mutation = {
   revokeRefreshTokensForUser: Scalars['Boolean'];
   loginUser: LoginResponse;
   registerUser: Scalars['Boolean'];
+  followUserV2: Scalars['Boolean'];
+  followUser: Scalars['Boolean'];
   sendMessage: Message;
   createPost: Scalars['Boolean'];
   deletePost: Scalars['Boolean'];
@@ -108,6 +120,19 @@ export type MutationRegisterUserArgs = {
   username: Scalars['String'];
   lastName: Scalars['String'];
   firstName: Scalars['String'];
+};
+
+
+export type MutationFollowUserV2Args = {
+  followingId: Scalars['Int'];
+  username: Scalars['String'];
+};
+
+
+export type MutationFollowUserArgs = {
+  value: Scalars['Int'];
+  followingId: Scalars['Int'];
+  username: Scalars['String'];
 };
 
 
@@ -189,6 +214,7 @@ export type Query = {
   getAllMessagesFromUser: Array<Message>;
   getAllPosts: Array<Post>;
   getAllUserPosts: Array<Post>;
+  getAllSpecificUserPosts: Array<Post>;
 };
 
 
@@ -199,6 +225,11 @@ export type QueryGetSpecificUserInfoArgs = {
 
 export type QueryGetAllMessagesFromUserArgs = {
   fromId: Scalars['Int'];
+};
+
+
+export type QueryGetAllSpecificUserPostsArgs = {
+  userId: Scalars['Int'];
 };
 
 export type Subscription = {
@@ -216,10 +247,12 @@ export type Users = {
   username: Scalars['String'];
   password: Scalars['String'];
   tokenVersion: Scalars['Int'];
-  followers: Scalars['Int'];
-  following: Scalars['Int'];
+  followersCount: Scalars['Int'];
+  followingCount: Scalars['Int'];
   profileId: Scalars['Int'];
   posts: Array<Post>;
+  follower: Array<Following>;
+  following: Array<Following>;
   profile: Profile;
 };
 
@@ -230,6 +263,21 @@ export type PostSnippetFragment = (
     { __typename?: 'LikedPost' }
     & Pick<LikedPost, 'userId'>
   )> }
+);
+
+export type SpecifcUserSnippetFragment = (
+  { __typename?: 'Users' }
+  & Pick<Users, 'id' | 'followersCount' | 'followingCount' | 'username'>
+  & { following: Array<(
+    { __typename?: 'Following' }
+    & Pick<Following, 'id' | 'username' | 'followerId' | 'followingId'>
+  )>, follower: Array<(
+    { __typename?: 'Following' }
+    & Pick<Following, 'id' | 'username' | 'followerId' | 'followingId'>
+  )>, profile: (
+    { __typename?: 'Profile' }
+    & Pick<Profile, 'avatar' | 'website' | 'location' | 'bio'>
+  ) }
 );
 
 export type ByeQueryVariables = Exact<{ [key: string]: never; }>;
@@ -284,6 +332,18 @@ export type DeleteUserMutationVariables = Exact<{
 export type DeleteUserMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteUser'>
+);
+
+export type FollowUserMutationVariables = Exact<{
+  username: Scalars['String'];
+  followingId: Scalars['Int'];
+  value: Scalars['Int'];
+}>;
+
+
+export type FollowUserMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'followUser'>
 );
 
 export type GetAllMessagesFromUserQueryVariables = Exact<{
@@ -347,6 +407,41 @@ export type GetAllPostsQuery = (
   )> }
 );
 
+export type GetAllSpecificUserPostsQueryVariables = Exact<{
+  userId: Scalars['Int'];
+}>;
+
+
+export type GetAllSpecificUserPostsQuery = (
+  { __typename?: 'Query' }
+  & { getAllSpecificUserPosts: Array<(
+    { __typename?: 'Post' }
+    & Pick<Post, 'id' | 'userId' | 'firstName' | 'lastName' | 'content' | 'voteStatus' | 'datePublished' | 'userName' | 'points' | 'commentsCount'>
+    & { likes: Array<(
+      { __typename?: 'LikedPost' }
+      & Pick<LikedPost, 'userId'>
+    )>, comments: Array<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'comment'>
+      & { user: (
+        { __typename?: 'Users' }
+        & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username'>
+        & { profile: (
+          { __typename?: 'Profile' }
+          & Pick<Profile, 'avatar'>
+        ) }
+      ) }
+    )>, user: (
+      { __typename?: 'Users' }
+      & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username' | 'email'>
+      & { profile: (
+        { __typename?: 'Profile' }
+        & Pick<Profile, 'id' | 'avatar'>
+      ) }
+    ) }
+  )> }
+);
+
 export type GetAllUserMessagesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -380,7 +475,7 @@ export type GetAllUsersQuery = (
   { __typename?: 'Query' }
   & { getAllUsers: Array<(
     { __typename?: 'Users' }
-    & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username' | 'email' | 'followers' | 'following'>
+    & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username' | 'email' | 'followersCount' | 'followingCount'>
   )> }
 );
 
@@ -391,8 +486,14 @@ export type GetCurrentUserQuery = (
   { __typename?: 'Query' }
   & { getCurrentUser?: Maybe<(
     { __typename?: 'Users' }
-    & Pick<Users, 'id' | 'firstName' | 'lastName' | 'email' | 'username' | 'followers' | 'following'>
-    & { profile: (
+    & Pick<Users, 'id' | 'firstName' | 'lastName' | 'email' | 'username' | 'followersCount' | 'followingCount'>
+    & { following: Array<(
+      { __typename?: 'Following' }
+      & Pick<Following, 'id' | 'username' | 'followerId' | 'followingId'>
+    )>, follower: Array<(
+      { __typename?: 'Following' }
+      & Pick<Following, 'id' | 'username' | 'followerId' | 'followingId'>
+    )>, profile: (
       { __typename?: 'Profile' }
       & Pick<Profile, 'id' | 'bio' | 'avatar' | 'website' | 'location'>
     ) }
@@ -408,10 +509,16 @@ export type GetSpecificUserInfoQuery = (
   { __typename?: 'Query' }
   & { getSpecificUserInfo: (
     { __typename?: 'Users' }
-    & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username'>
-    & { profile: (
+    & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username' | 'followingCount' | 'followersCount'>
+    & { following: Array<(
+      { __typename?: 'Following' }
+      & Pick<Following, 'id' | 'username' | 'followerId' | 'followingId'>
+    )>, follower: Array<(
+      { __typename?: 'Following' }
+      & Pick<Following, 'id' | 'username' | 'followerId' | 'followingId'>
+    )>, profile: (
       { __typename?: 'Profile' }
-      & Pick<Profile, 'avatar'>
+      & Pick<Profile, 'avatar' | 'bio' | 'location' | 'website'>
     ) }
   ) }
 );
@@ -573,6 +680,32 @@ export const PostSnippetFragmentDoc = gql`
   datePublished
   userName
   points
+}
+    `;
+export const SpecifcUserSnippetFragmentDoc = gql`
+    fragment SpecifcUserSnippet on Users {
+  id
+  followersCount
+  followingCount
+  username
+  following {
+    id
+    username
+    followerId
+    followingId
+  }
+  follower {
+    id
+    username
+    followerId
+    followingId
+  }
+  profile {
+    avatar
+    website
+    location
+    bio
+  }
 }
     `;
 export const ByeDocument = gql`
@@ -743,6 +876,39 @@ export function useDeleteUserMutation(baseOptions?: Apollo.MutationHookOptions<D
 export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutation>;
 export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
 export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
+export const FollowUserDocument = gql`
+    mutation FollowUser($username: String!, $followingId: Int!, $value: Int!) {
+  followUser(username: $username, followingId: $followingId, value: $value)
+}
+    `;
+export type FollowUserMutationFn = Apollo.MutationFunction<FollowUserMutation, FollowUserMutationVariables>;
+
+/**
+ * __useFollowUserMutation__
+ *
+ * To run a mutation, you first call `useFollowUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useFollowUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [followUserMutation, { data, loading, error }] = useFollowUserMutation({
+ *   variables: {
+ *      username: // value for 'username'
+ *      followingId: // value for 'followingId'
+ *      value: // value for 'value'
+ *   },
+ * });
+ */
+export function useFollowUserMutation(baseOptions?: Apollo.MutationHookOptions<FollowUserMutation, FollowUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<FollowUserMutation, FollowUserMutationVariables>(FollowUserDocument, options);
+      }
+export type FollowUserMutationHookResult = ReturnType<typeof useFollowUserMutation>;
+export type FollowUserMutationResult = Apollo.MutationResult<FollowUserMutation>;
+export type FollowUserMutationOptions = Apollo.BaseMutationOptions<FollowUserMutation, FollowUserMutationVariables>;
 export const GetAllMessagesFromUserDocument = gql`
     query GetAllMessagesFromUser($fromId: Int!) {
   getAllMessagesFromUser(fromId: $fromId) {
@@ -868,6 +1034,76 @@ export function useGetAllPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type GetAllPostsQueryHookResult = ReturnType<typeof useGetAllPostsQuery>;
 export type GetAllPostsLazyQueryHookResult = ReturnType<typeof useGetAllPostsLazyQuery>;
 export type GetAllPostsQueryResult = Apollo.QueryResult<GetAllPostsQuery, GetAllPostsQueryVariables>;
+export const GetAllSpecificUserPostsDocument = gql`
+    query GetAllSpecificUserPosts($userId: Int!) {
+  getAllSpecificUserPosts(userId: $userId) {
+    id
+    userId
+    firstName
+    lastName
+    content
+    voteStatus
+    likes {
+      userId
+    }
+    comments {
+      comment
+      user {
+        id
+        firstName
+        lastName
+        username
+        profile {
+          avatar
+        }
+      }
+    }
+    user {
+      id
+      firstName
+      lastName
+      username
+      email
+      profile {
+        id
+        avatar
+      }
+    }
+    datePublished
+    userName
+    points
+    commentsCount
+  }
+}
+    `;
+
+/**
+ * __useGetAllSpecificUserPostsQuery__
+ *
+ * To run a query within a React component, call `useGetAllSpecificUserPostsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllSpecificUserPostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllSpecificUserPostsQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetAllSpecificUserPostsQuery(baseOptions: Apollo.QueryHookOptions<GetAllSpecificUserPostsQuery, GetAllSpecificUserPostsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllSpecificUserPostsQuery, GetAllSpecificUserPostsQueryVariables>(GetAllSpecificUserPostsDocument, options);
+      }
+export function useGetAllSpecificUserPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllSpecificUserPostsQuery, GetAllSpecificUserPostsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllSpecificUserPostsQuery, GetAllSpecificUserPostsQueryVariables>(GetAllSpecificUserPostsDocument, options);
+        }
+export type GetAllSpecificUserPostsQueryHookResult = ReturnType<typeof useGetAllSpecificUserPostsQuery>;
+export type GetAllSpecificUserPostsLazyQueryHookResult = ReturnType<typeof useGetAllSpecificUserPostsLazyQuery>;
+export type GetAllSpecificUserPostsQueryResult = Apollo.QueryResult<GetAllSpecificUserPostsQuery, GetAllSpecificUserPostsQueryVariables>;
 export const GetAllUserMessagesDocument = gql`
     query GetAllUserMessages {
   getAllUserMessages {
@@ -931,8 +1167,8 @@ export const GetAllUsersDocument = gql`
     lastName
     username
     email
-    followers
-    following
+    followersCount
+    followingCount
   }
 }
     `;
@@ -971,8 +1207,20 @@ export const GetCurrentUserDocument = gql`
     lastName
     email
     username
-    followers
-    following
+    followersCount
+    followingCount
+    following {
+      id
+      username
+      followerId
+      followingId
+    }
+    follower {
+      id
+      username
+      followerId
+      followingId
+    }
     profile {
       id
       bio
@@ -1017,8 +1265,25 @@ export const GetSpecificUserInfoDocument = gql`
     firstName
     lastName
     username
+    followingCount
+    followersCount
+    following {
+      id
+      username
+      followerId
+      followingId
+    }
+    follower {
+      id
+      username
+      followerId
+      followingId
+    }
     profile {
       avatar
+      bio
+      location
+      website
     }
   }
 }

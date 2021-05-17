@@ -7,13 +7,15 @@ import { Login } from "./pages/Login";
 import { Profile } from "./pages/Profile";
 import { Register } from "./pages/Register";
 import { Messages } from "./pages/Messages";
+import { SingleUser } from "./pages/SingleUser";
 
 export const Routes: React.FC = () => {
   return (
     <BrowserRouter>
       <Navbar />
       <Switch>
-      <Route path="/post/:postID" component={Post} />
+        <Route path="/post/:postID" component={Post} />
+        <Route path="/user/:userID" component={SingleUser} />
         <Route exact path="/" component={Home} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />

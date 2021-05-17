@@ -37,9 +37,11 @@ export const LikeButton: React.FC<Props> = ({ post, currentUser }) => {
     const user = client.readQuery({
       query: GET_CURRENT_USER,
     });
+    // console.log(user)
     if (user.getCurrentUser === null) {
-      return;
-    } else if (
+      setLiked(false);
+    } 
+    else if (
       post.likes.find((like) => like.userId === user.getCurrentUser.id)
     ) {
       setLiked(true);
@@ -47,6 +49,7 @@ export const LikeButton: React.FC<Props> = ({ post, currentUser }) => {
       setLiked(false);
     }
   }, [post, currentUser]);
+
 
   const handleLikePost = async () => {
     await likePost({

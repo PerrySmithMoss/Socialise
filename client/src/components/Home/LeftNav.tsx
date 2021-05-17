@@ -45,8 +45,6 @@ export const LeftNav: React.FC = () => {
   const location = useLocation();
   const { pathname } = location;
   const splitLocation = pathname.split("/");
-  console.log(pathname);
-  console.log(splitLocation);
 
   return (
     <div className={classes.root}>

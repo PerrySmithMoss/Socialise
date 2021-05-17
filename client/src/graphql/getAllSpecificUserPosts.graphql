@@ -1,0 +1,40 @@
+query GetAllSpecificUserPosts($userId: Int!) {
+  getAllSpecificUserPosts(userId: $userId) {
+    id
+    userId
+    firstName
+    lastName
+    content
+    voteStatus
+    likes {
+      userId
+    }
+    comments {
+      comment
+      user{
+        id
+        firstName
+        lastName
+        username
+        profile {
+          avatar
+        }
+      }
+    }
+    user {
+      id
+      firstName
+      lastName
+      username
+      email
+      profile {
+        id
+        avatar
+      }
+    }
+    datePublished
+    userName
+    points
+    commentsCount
+  }
+}
