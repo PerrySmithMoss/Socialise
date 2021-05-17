@@ -15,7 +15,7 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import { getConnection } from "typeorm";
+import { getConnection, Like } from "typeorm";
 import { createAccessKey, createRefreshKey } from "../../auth/auth";
 import { isAuth } from "../../auth/middleware/isAuth";
 import { sendRefreshKey } from "../../auth/sendRefreshKey";
@@ -370,5 +370,13 @@ export class UserResolver {
       return false;
     }
     return true;
+  }
+
+  @Query(() => [Users])
+  async searchUsers(@Arg("username", () => String) username: string) {
+    return await Users.find({
+      relations: ["profile", "following", "follower"],
+      where: { username: Like(`%${username}%`) },
+    });
   }
 }
