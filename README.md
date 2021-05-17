@@ -14,5 +14,6 @@
   <li>Like / Unlike posts</li>
   <li>Following / Followers capability </li>
   <li>Ability for users to update their profile</li>
+  <li>Search for other users</li>
 </ul>
 </div>
