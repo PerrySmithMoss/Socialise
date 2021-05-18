@@ -83,7 +83,7 @@ export const SingleUserHeader: React.FC<Props> = ({ location }) => {
   let { state } = useLocation();
   const { data } = useGetSpecificUserInfoQuery({
     fetchPolicy: "network-only",
-    variables: { userId: location.state.post.user.id },
+    variables: { userId: location.state.user.id },
   });
   const [followUser] = useFollowUserMutation();
   const [value, setValue] = React.useState(0);

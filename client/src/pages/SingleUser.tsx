@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Grid, { GridSpacing } from "@material-ui/core/Grid";
@@ -45,9 +45,9 @@ export const SingleUser: React.FC<Props> = ({ location }) => {
           </Grid>
 
           <Grid item className={classes.grid}>
-            <SingleUserHeader location={location}/>
+            <SingleUserHeader location={location} />
             <Divider />
-            <SingleUserPosts location={location}/>
+            <SingleUserPosts location={location} />
           </Grid>
 
           <Grid item className={classes.grid}>

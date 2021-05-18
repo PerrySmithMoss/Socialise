@@ -9,7 +9,8 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
-import { useSearchUsersLazyQuery } from "../generated/graphql";
+import { useGetCurrentUserQuery, useSearchUsersLazyQuery } from "../generated/graphql";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -38,6 +39,9 @@ export const SearchBar: React.FC = () => {
   const classes = useStyles();
   const [searchInput, setSearchInput] = useState("");
   const [executeSearch, { data }] = useSearchUsersLazyQuery();
+  const { data: currentUser, loading } = useGetCurrentUserQuery({
+    fetchPolicy: "cache-first",
+  });
 
   useEffect(() => {
     console.log(data);
@@ -72,15 +76,51 @@ export const SearchBar: React.FC = () => {
       {data &&
         data.searchUsers.map((user) => (
           <List className={classes.usersList}>
-            <ListItem alignItems="flex-start">
-              <ListItemAvatar>
+            {user.id === currentUser?.getCurrentUser?.id ? (
+              <ListItem
+                button
+                component={Link}
+                to={{ pathname: `/profile` }}
+                alignItems="flex-start"
+              >
+                <ListItemAvatar>
+                  <Avatar
+                    alt="Remy Sharp"
+                    src={user.profile.avatar as string}
+                  />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={`${user.firstName} ${user.lastName}`}
+                  secondary={`@${user.username}`}
+                />
+              </ListItem>
+            ) : (
+              <ListItem
+                button
+                component={Link}
+                to={{ pathname: `/user/${user.id}`, state: { user } }}
+                alignItems="flex-start"
+              >
+                <ListItemAvatar>
+                  <Avatar
+                    alt="Remy Sharp"
+                    src={user.profile.avatar as string}
+                  />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={`${user.firstName} ${user.lastName}`}
+                  secondary={`@${user.username}`}
+                />
+              </ListItem>
+            )}
+
+            {/* <ListItemAvatar>
                 <Avatar alt="Remy Sharp" src={user.profile.avatar as string} />
               </ListItemAvatar>
               <ListItemText
                 primary={`${user.firstName} ${user.lastName}`}
                 secondary={`@${user.username}`}
-              />
-            </ListItem>
+              /> */}
           </List>
         ))}
     </div>

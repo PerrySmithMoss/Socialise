@@ -69,6 +69,7 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
         flexDirection="row"
         p={1}
         m={1}
+        mt={6}
       >
         <Box p={1}>
           <TextField

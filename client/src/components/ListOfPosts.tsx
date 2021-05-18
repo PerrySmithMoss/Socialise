@@ -25,6 +25,7 @@ import moment from "moment";
 import { Link } from "react-router-dom";
 import { LikeButton } from "./Post/LikeButton";
 import { CommentModal } from "./Post/CommentModal";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -74,7 +75,21 @@ export const ListOfPosts: React.FC = () => {
     setAnchorEl(null);
   };
   if (!data) {
-    return <div>Loading...</div>;
+    return (
+      <div style={{ width: "100%" }}>
+        <Box
+          display="flex"
+          justifyContent="center"
+          minHeight="100vh"
+          m={1}
+          p={1}
+        >
+          <Box p={1}>
+            <CircularProgress size={125} />
+          </Box>
+        </Box>
+      </div>
+    );
   }
 
   const handleCommentClickOpen = (post: any) => {
@@ -99,25 +114,22 @@ export const ListOfPosts: React.FC = () => {
               to={{ pathname: `/post/${post.id}`, state: { post } }}
               alignItems="flex-start"
             >
-              {post.user.id ===
-                currentUser?.getCurrentUser?.id ? (
-                  <Link
-                    to={{ pathname: `/profile` }}
-                  >
-                    <ListItemAvatar>
-                      <Avatar alt="Remy Sharp" src={post.user.profile.avatar} />
-                    </ListItemAvatar>
-                  </Link>
-                ) : (
-                  <Link
-                  to={{ pathname: `/user/${post.user.id}`, state: { post } }}
+              {post.user.id === currentUser?.getCurrentUser?.id ? (
+                <Link to={{ pathname: `/profile` }}>
+                  <ListItemAvatar>
+                    <Avatar alt="Remy Sharp" src={post.user.profile.avatar} />
+                  </ListItemAvatar>
+                </Link>
+              ) : (
+                <Link
+                  to={{ pathname: `/user/${post.user.id}`, state: { user: post.user } }}
                 >
                   <ListItemAvatar>
                     <Avatar alt="Remy Sharp" src={post.user.profile.avatar} />
                   </ListItemAvatar>
                 </Link>
-                )}
-          
+              )}
+
               <ListItemText
                 style={{ textDecoration: "none" }}
                 primary={

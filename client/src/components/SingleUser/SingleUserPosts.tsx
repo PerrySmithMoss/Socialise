@@ -50,8 +50,8 @@ interface Props {
 
 export const SingleUserPosts: React.FC<Props> = ({ location }) => {
   const classes = useStyles();
-  const { data: singleUser  } = useGetSpecificUserInfoQuery({ fetchPolicy: "network-only", variables: {userId: location.state.post.user.id} });
-  const { data } = useGetAllSpecificUserPostsQuery({ fetchPolicy: "network-only", variables: {userId: location.state.post.user.id} });
+  const { data: singleUser  } = useGetSpecificUserInfoQuery({ fetchPolicy: "network-only", variables: {userId: location.state.user.id} });
+  const { data } = useGetAllSpecificUserPostsQuery({ fetchPolicy: "network-only", variables: {userId: location.state.user.id} });
   const { data: currentUser, loading } = useGetCurrentUserQuery({ fetchPolicy: "network-only"});
   const [deletePost] = useDeletePostMutation();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
