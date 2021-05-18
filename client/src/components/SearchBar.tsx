@@ -9,7 +9,10 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
-import { useGetCurrentUserQuery, useSearchUsersLazyQuery } from "../generated/graphql";
+import {
+  useGetCurrentUserQuery,
+  useSearchUsersLazyQuery,
+} from "../generated/graphql";
 import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -113,14 +116,6 @@ export const SearchBar: React.FC = () => {
                 />
               </ListItem>
             )}
-
-            {/* <ListItemAvatar>
-                <Avatar alt="Remy Sharp" src={user.profile.avatar as string} />
-              </ListItemAvatar>
-              <ListItemText
-                primary={`${user.firstName} ${user.lastName}`}
-                secondary={`@${user.username}`}
-              /> */}
           </List>
         ))}
     </div>

@@ -1,5 +1,5 @@
-query GetAllPosts{
-  getAllPosts{
+query GetAllPosts {
+  getAllPosts {
     id
     userId
     firstName
@@ -9,9 +9,12 @@ query GetAllPosts{
     likes {
       userId
     }
+    retweets {
+      userId
+    }
     comments {
       comment
-      user{
+      user {
         id
         firstName
         lastName
@@ -35,6 +38,7 @@ query GetAllPosts{
     datePublished
     userName
     points
+    retweetsCount
     commentsCount
   }
 }

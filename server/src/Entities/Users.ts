@@ -14,6 +14,7 @@ import { LikedPost } from "./LikedPost";
 import { Comment } from "./Comment"
 import { Message } from "./Message"
 import { Following } from "./Following"
+import { RetweetPost } from "./RetweetPost"
 
 @ObjectType()
 @Entity("users")
@@ -66,6 +67,9 @@ export class Users extends BaseEntity {
 
   @OneToMany(() => LikedPost, (like) => like.user)
   likes: LikedPost[];
+
+  @OneToMany(() => RetweetPost, (retweet) => retweet.user)
+  retweets: LikedPost[];
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];

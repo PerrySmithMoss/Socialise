@@ -6,7 +6,6 @@ import Divider from "@material-ui/core/Divider";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
-import SwapVertIcon from "@material-ui/icons/SwapVert";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { Box, IconButton, Menu, MenuItem } from "@material-ui/core";
 import ModeCommentIcon from "@material-ui/icons/ModeComment";
@@ -26,6 +25,7 @@ import { Link } from "react-router-dom";
 import { LikeButton } from "./Post/LikeButton";
 import { CommentModal } from "./Post/CommentModal";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { RetweetPost } from "./Post/RetweetPost";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -122,7 +122,10 @@ export const ListOfPosts: React.FC = () => {
                 </Link>
               ) : (
                 <Link
-                  to={{ pathname: `/user/${post.user.id}`, state: { user: post.user } }}
+                  to={{
+                    pathname: `/user/${post.user.id}`,
+                    state: { user: post.user },
+                  }}
                 >
                   <ListItemAvatar>
                     <Avatar alt="Remy Sharp" src={post.user.profile.avatar} />
@@ -163,12 +166,8 @@ export const ListOfPosts: React.FC = () => {
                 openCommentDialog={openCommentDialog}
                 handleCommentClickClose={handleCommentClickClose}
               />
-              <Box flexGrow={1}>
-                <IconButton aria-label="settings">
-                  <SwapVertIcon />
-                </IconButton>
-                <span>2</span>
-              </Box>
+              <RetweetPost currentUser={currentUser} post={post} />
+
               <LikeButton currentUser={currentUser} post={post} />
               <Box flexGrow={1}>
                 <IconButton

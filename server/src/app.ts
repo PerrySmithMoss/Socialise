@@ -21,6 +21,7 @@ import { Message } from "./Entities/Message";
 
 import http from "http";
 import { Following } from "./Entities/Following";
+import { RetweetPost } from "./Entities/RetweetPost";
 
 const main = async () => {
   const app: Application = express();
@@ -44,7 +45,7 @@ const main = async () => {
     password: `${process.env.PASSWORD}`,
     logging: true,
     synchronize: false,
-    entities: [Users, Post, Profile, LikedPost, Comment, Message, Following],
+    entities: [Users, Post, Profile, LikedPost, Comment, Message, Following, RetweetPost],
   });
 
   app.post("/refresh_token", async (req: Request, res: Response) => {
@@ -107,14 +108,6 @@ const main = async () => {
       `🚀  Subscriptions ready at ws://localhost:${PORT}${apolloServer.subscriptionsPath}`,
     );
     });
-
-  // const httpPort = 4003;
-
-  // httpServer.listen(httpPort, () => {
-  //   console.log(
-  //     `🚀 Subscriptions ready at ws://localhost:${httpPort}${apolloServer.subscriptionsPath}`
-  //   );
-  // });
 };
 
 main().catch((err) => {

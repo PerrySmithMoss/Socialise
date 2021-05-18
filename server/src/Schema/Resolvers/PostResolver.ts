@@ -18,6 +18,7 @@ import { Post } from "../../Entities/Post";
 import { Users } from "../../Entities/Users";
 import { MyContext } from "../../Types/MyContext";
 import { Comment } from "../../Entities/Comment";
+import { RetweetPost } from "../../Entities/RetweetPost";
 
 @Resolver()
 export class PostResolver {
@@ -26,6 +27,7 @@ export class PostResolver {
     const posts = await Post.find({
       relations: [
         "likes",
+        "retweets",
         "user",
         "user.profile",
         "comments",
@@ -67,6 +69,7 @@ export class PostResolver {
       const userPosts = await Post.find({
         relations: [
           "likes",
+          "retweets",
           "user",
           "user.profile",
           "comments",
@@ -95,6 +98,7 @@ export class PostResolver {
       const userPosts = await Post.find({
         relations: [
           "likes",
+          "retweets",
           "user",
           "user.profile",
           "comments",
@@ -215,6 +219,75 @@ export class PostResolver {
             `
             UPDATE posts 
             SET points = points + ${realValue}
+            WHERE id = ${postId};
+            `
+          );
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async retweetPost(
+    @Arg("postId", () => Int) postId: number,
+    @Arg("value", () => Int) value: number,
+    @Ctx() context: MyContext
+  ) {
+    const authorization = context.req.headers["authorization"];
+    console.log(authorization);
+
+    try {
+      const token = authorization!.split(" ")[1];
+      const payload: any = verify(token, process.env.ACCESS_KEY!);
+      const userId = payload.userId;
+      console.log("Your user id is:" + payload.userId);
+
+      const isLiked = value !== -1;
+      console.log("isLiked: ", isLiked);
+      const realValue = isLiked ? 1 : -1;
+      console.log("realValue: ", realValue);
+
+      const likedPost = await RetweetPost.findOne({
+        where: { postId, userId },
+      });
+
+      // the user has retweeted the post before
+      if (likedPost) {
+        console.log("User has already retweeted the post before");
+        await getConnection().transaction(async (trns) => {
+          await trns.query(
+            `
+            DELETE FROM retweets
+            WHERE postId = ${postId} AND userId = ${userId}
+            `
+          );
+          await trns.query(
+            `
+            UPDATE posts
+            SET retweetsCount = retweetsCount - 1
+            WHERE id = ${postId}
+            `
+          );
+        });
+      } else if (!likedPost) {
+        // user has not retweeted post
+        await getConnection().transaction(async (trns) => {
+          console.log("User has not retweeted the post before");
+          await trns.query(
+            `
+            INSERT INTO retweets (userId, postId, value)
+            VALUES (${userId}, ${postId}, ${realValue});
+            `
+          );
+          await trns.query(
+            `
+            UPDATE posts 
+            SET retweetsCount = retweetsCount + ${realValue}
             WHERE id = ${postId};
             `
           );

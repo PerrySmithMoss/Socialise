@@ -3,6 +3,7 @@ import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGe
 import { LikedPost } from "./LikedPost";
 import { Comment } from "./Comment"
 import { Users } from "./Users";
+import { RetweetPost } from "./RetweetPost";
 
 @ObjectType()
 @Entity("posts")
@@ -41,6 +42,10 @@ export class Post extends BaseEntity {
 
   @Field()
   @Column({ type: "int", default: 0 })
+  retweetsCount!: number;
+
+  @Field()
+  @Column({ type: "int", default: 0 })
   commentsCount!: number;
 
   @Field(() => Int, { nullable: true })
@@ -51,6 +56,12 @@ export class Post extends BaseEntity {
   })
   @Field(() => [LikedPost])
   likes: LikedPost[];
+
+  @OneToMany(() => RetweetPost, (retweet) => retweet.post, {
+    cascade: true
+  })
+  @Field(() => [RetweetPost])
+  retweets: RetweetPost[];
 
   @OneToMany(() => Comment, (comment) => comment.post, {
     cascade: true

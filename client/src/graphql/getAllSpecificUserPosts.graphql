@@ -9,9 +9,12 @@ query GetAllSpecificUserPosts($userId: Int!) {
     likes {
       userId
     }
+    retweets {
+      userId
+    }
     comments {
       comment
-      user{
+      user {
         id
         firstName
         lastName

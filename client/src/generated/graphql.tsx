@@ -82,6 +82,7 @@ export type Mutation = {
   createPost: Scalars['Boolean'];
   deletePost: Scalars['Boolean'];
   likePost: Scalars['Boolean'];
+  retweetPost: Scalars['Boolean'];
   commentOnPost: Scalars['Boolean'];
 };
 
@@ -163,6 +164,12 @@ export type MutationLikePostArgs = {
 };
 
 
+export type MutationRetweetPostArgs = {
+  value: Scalars['Int'];
+  postId: Scalars['Int'];
+};
+
+
 export type MutationCommentOnPostArgs = {
   datePublished: Scalars['DateTime'];
   comment: Scalars['String'];
@@ -179,9 +186,11 @@ export type Post = {
   content: Scalars['String'];
   datePublished: Scalars['DateTime'];
   points: Scalars['Float'];
+  retweetsCount: Scalars['Float'];
   commentsCount: Scalars['Float'];
   voteStatus?: Maybe<Scalars['Int']>;
   likes: Array<LikedPost>;
+  retweets: Array<RetweetPost>;
   comments: Array<Comment>;
   user: Users;
 };
@@ -238,6 +247,14 @@ export type QueryGetAllSpecificUserPostsArgs = {
   userId: Scalars['Int'];
 };
 
+export type RetweetPost = {
+  __typename?: 'RetweetPost';
+  id: Scalars['Int'];
+  userId: Scalars['Int'];
+  user: Users;
+  postId: Scalars['Int'];
+};
+
 export type Subscription = {
   __typename?: 'Subscription';
   newMessage: Message;
@@ -264,10 +281,13 @@ export type Users = {
 
 export type PostSnippetFragment = (
   { __typename?: 'Post' }
-  & Pick<Post, 'id' | 'userId' | 'firstName' | 'lastName' | 'content' | 'voteStatus' | 'datePublished' | 'userName' | 'points'>
+  & Pick<Post, 'id' | 'userId' | 'firstName' | 'lastName' | 'content' | 'voteStatus' | 'datePublished' | 'userName' | 'points' | 'retweetsCount'>
   & { likes: Array<(
     { __typename?: 'LikedPost' }
     & Pick<LikedPost, 'userId'>
+  )>, retweets: Array<(
+    { __typename?: 'RetweetPost' }
+    & Pick<RetweetPost, 'userId'>
   )> }
 );
 
@@ -387,10 +407,13 @@ export type GetAllPostsQuery = (
   { __typename?: 'Query' }
   & { getAllPosts: Array<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'userId' | 'firstName' | 'lastName' | 'content' | 'voteStatus' | 'datePublished' | 'userName' | 'points' | 'commentsCount'>
+    & Pick<Post, 'id' | 'userId' | 'firstName' | 'lastName' | 'content' | 'voteStatus' | 'datePublished' | 'userName' | 'points' | 'retweetsCount' | 'commentsCount'>
     & { likes: Array<(
       { __typename?: 'LikedPost' }
       & Pick<LikedPost, 'userId'>
+    )>, retweets: Array<(
+      { __typename?: 'RetweetPost' }
+      & Pick<RetweetPost, 'userId'>
     )>, comments: Array<(
       { __typename?: 'Comment' }
       & Pick<Comment, 'comment'>
@@ -426,6 +449,9 @@ export type GetAllSpecificUserPostsQuery = (
     & { likes: Array<(
       { __typename?: 'LikedPost' }
       & Pick<LikedPost, 'userId'>
+    )>, retweets: Array<(
+      { __typename?: 'RetweetPost' }
+      & Pick<RetweetPost, 'userId'>
     )>, comments: Array<(
       { __typename?: 'Comment' }
       & Pick<Comment, 'comment'>
@@ -482,6 +508,10 @@ export type GetAllUsersQuery = (
   & { getAllUsers: Array<(
     { __typename?: 'Users' }
     & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username' | 'email' | 'followersCount' | 'followingCount'>
+    & { profile: (
+      { __typename?: 'Profile' }
+      & Pick<Profile, 'id' | 'bio' | 'avatar' | 'website' | 'location'>
+    ) }
   )> }
 );
 
@@ -540,6 +570,9 @@ export type GetAllUserPostsQuery = (
     & { likes: Array<(
       { __typename?: 'LikedPost' }
       & Pick<LikedPost, 'userId'>
+    )>, retweets: Array<(
+      { __typename?: 'RetweetPost' }
+      & Pick<RetweetPost, 'userId'>
     )>, comments: Array<(
       { __typename?: 'Comment' }
       & Pick<Comment, 'comment'>
@@ -632,6 +665,17 @@ export type RegisterMutation = (
   & Pick<Mutation, 'registerUser'>
 );
 
+export type RetweetPostMutationVariables = Exact<{
+  value: Scalars['Int'];
+  postId: Scalars['Int'];
+}>;
+
+
+export type RetweetPostMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'retweetPost'>
+);
+
 export type SearchUsersQueryVariables = Exact<{
   username: Scalars['String'];
 }>;
@@ -706,9 +750,13 @@ export const PostSnippetFragmentDoc = gql`
   likes {
     userId
   }
+  retweets {
+    userId
+  }
   datePublished
   userName
   points
+  retweetsCount
 }
     `;
 export const SpecifcUserSnippetFragmentDoc = gql`
@@ -1006,6 +1054,9 @@ export const GetAllPostsDocument = gql`
     likes {
       userId
     }
+    retweets {
+      userId
+    }
     comments {
       comment
       user {
@@ -1032,6 +1083,7 @@ export const GetAllPostsDocument = gql`
     datePublished
     userName
     points
+    retweetsCount
     commentsCount
   }
 }
@@ -1073,6 +1125,9 @@ export const GetAllSpecificUserPostsDocument = gql`
     content
     voteStatus
     likes {
+      userId
+    }
+    retweets {
       userId
     }
     comments {
@@ -1198,6 +1253,13 @@ export const GetAllUsersDocument = gql`
     email
     followersCount
     followingCount
+    profile {
+      id
+      bio
+      avatar
+      website
+      location
+    }
   }
 }
     `;
@@ -1355,6 +1417,9 @@ export const GetAllUserPostsDocument = gql`
     content
     voteStatus
     likes {
+      userId
+    }
+    retweets {
       userId
     }
     comments {
@@ -1623,6 +1688,38 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const RetweetPostDocument = gql`
+    mutation RetweetPost($value: Int!, $postId: Int!) {
+  retweetPost(value: $value, postId: $postId)
+}
+    `;
+export type RetweetPostMutationFn = Apollo.MutationFunction<RetweetPostMutation, RetweetPostMutationVariables>;
+
+/**
+ * __useRetweetPostMutation__
+ *
+ * To run a mutation, you first call `useRetweetPostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRetweetPostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [retweetPostMutation, { data, loading, error }] = useRetweetPostMutation({
+ *   variables: {
+ *      value: // value for 'value'
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useRetweetPostMutation(baseOptions?: Apollo.MutationHookOptions<RetweetPostMutation, RetweetPostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RetweetPostMutation, RetweetPostMutationVariables>(RetweetPostDocument, options);
+      }
+export type RetweetPostMutationHookResult = ReturnType<typeof useRetweetPostMutation>;
+export type RetweetPostMutationResult = Apollo.MutationResult<RetweetPostMutation>;
+export type RetweetPostMutationOptions = Apollo.BaseMutationOptions<RetweetPostMutation, RetweetPostMutationVariables>;
 export const SearchUsersDocument = gql`
     query SearchUsers($username: String!) {
   searchUsers(username: $username) {

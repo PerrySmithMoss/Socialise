@@ -7,5 +7,12 @@ query getAllUsers {
     email
     followersCount
     followingCount
+    profile {
+      id
+      bio
+      avatar
+      website
+      location
+    }
   }
 }

@@ -46,7 +46,7 @@ export const YouMayKnow: React.FC = () => {
           <div key={user.id}>
             <ListItem key={user.id} button>
               <ListItemAvatar>
-                <Avatar />
+                <Avatar alt="Remy Sharp" src={user.profile.avatar} />
               </ListItemAvatar>
               <ListItemText
                 id={user.id}

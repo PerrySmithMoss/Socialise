@@ -1,14 +1,18 @@
 fragment PostSnippet on Post {
-    id
+  id
+  userId
+  firstName
+  lastName
+  content
+  voteStatus
+  likes {
     userId
-    firstName
-    lastName
-    content
-    voteStatus
-    likes {
-        userId
-    }
-    datePublished
-    userName
-    points
+  }
+  retweets {
+    userId
+  }
+  datePublished
+  userName
+  points
+  retweetsCount
 }
