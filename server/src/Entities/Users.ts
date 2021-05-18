@@ -55,6 +55,10 @@ export class Users extends BaseEntity {
   @Column("int", { default: 0 })
   followingCount!: number;
 
+  @Field(() => Date)
+  @Column({ nullable: true })
+  dateRegistered!: Date;
+
   @Field(() => Int)
   @Column({ nullable: true })
   profileId: number;

@@ -4,6 +4,7 @@ mutation Register(
   $lastName: String!
   $username: String!
   $password: String!
+  $dateRegistered: DateTime!
 ) {
   registerUser(
     email: $email
@@ -11,5 +12,6 @@ mutation Register(
     lastName: $lastName
     username: $username
     password: $password
+    dateRegistered: $dateRegistered
   )
 }

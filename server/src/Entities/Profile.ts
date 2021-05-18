@@ -31,7 +31,7 @@ export class Profile extends BaseEntity {
   website: string;
 
   @Field(() => String || null, {nullable: true})
-  @Column({nullable: true})
+  @Column({nullable: true, default: "http://localhost:5000/images/default-avatar.jpg"})
   avatar: string;
 
   // @Field(() => Int)

@@ -117,6 +117,7 @@ export type MutationLoginUserArgs = {
 
 export type MutationRegisterUserArgs = {
   password: Scalars['String'];
+  dateRegistered: Scalars['DateTime'];
   email: Scalars['String'];
   username: Scalars['String'];
   lastName: Scalars['String'];
@@ -272,6 +273,7 @@ export type Users = {
   tokenVersion: Scalars['Int'];
   followersCount: Scalars['Int'];
   followingCount: Scalars['Int'];
+  dateRegistered: Scalars['DateTime'];
   profileId: Scalars['Int'];
   posts: Array<Post>;
   follower: Array<Following>;
@@ -522,7 +524,7 @@ export type GetCurrentUserQuery = (
   { __typename?: 'Query' }
   & { getCurrentUser?: Maybe<(
     { __typename?: 'Users' }
-    & Pick<Users, 'id' | 'firstName' | 'lastName' | 'email' | 'username' | 'followersCount' | 'followingCount'>
+    & Pick<Users, 'id' | 'firstName' | 'lastName' | 'email' | 'username' | 'dateRegistered' | 'followersCount' | 'followingCount'>
     & { following: Array<(
       { __typename?: 'Following' }
       & Pick<Following, 'id' | 'username' | 'followerId' | 'followingId'>
@@ -657,6 +659,7 @@ export type RegisterMutationVariables = Exact<{
   lastName: Scalars['String'];
   username: Scalars['String'];
   password: Scalars['String'];
+  dateRegistered: Scalars['DateTime'];
 }>;
 
 
@@ -1298,6 +1301,7 @@ export const GetCurrentUserDocument = gql`
     lastName
     email
     username
+    dateRegistered
     followersCount
     followingCount
     following {
@@ -1648,13 +1652,14 @@ export function useNewMessageSubscription(baseOptions?: Apollo.SubscriptionHookO
 export type NewMessageSubscriptionHookResult = ReturnType<typeof useNewMessageSubscription>;
 export type NewMessageSubscriptionResult = Apollo.SubscriptionResult<NewMessageSubscription>;
 export const RegisterDocument = gql`
-    mutation Register($email: String!, $firstName: String!, $lastName: String!, $username: String!, $password: String!) {
+    mutation Register($email: String!, $firstName: String!, $lastName: String!, $username: String!, $password: String!, $dateRegistered: DateTime!) {
   registerUser(
     email: $email
     firstName: $firstName
     lastName: $lastName
     username: $username
     password: $password
+    dateRegistered: $dateRegistered
   )
 }
     `;
@@ -1678,6 +1683,7 @@ export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, Regis
  *      lastName: // value for 'lastName'
  *      username: // value for 'username'
  *      password: // value for 'password'
+ *      dateRegistered: // value for 'dateRegistered'
  *   },
  * });
  */

@@ -227,6 +227,7 @@ export class UserResolver {
     @Arg("lastName") lastName: string,
     @Arg("username") username: string,
     @Arg("email") email: string,
+    @Arg("dateRegistered") dateRegistered: Date,
     @Arg("password") password: string
   ) {
     const hashedPassword = await hash(password, 13);
@@ -239,6 +240,7 @@ export class UserResolver {
         lastName,
         username,
         email,
+        dateRegistered,
         password: hashedPassword,
         profileId: profile.id,
       });

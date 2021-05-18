@@ -5,6 +5,7 @@ import Button from "@material-ui/core/Button";
 import Box from "@material-ui/core/Box";
 import { useRegisterMutation } from "../generated/graphql";
 import { RouteComponentProps } from "react-router-dom";
+import moment from "moment";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -25,12 +26,15 @@ export const Register: React.FC<RouteComponentProps> = ({ history }) => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [dateRegistered, setDateRegistered] = useState(
+    moment().format("YYYY-MM-DD hh:mm:ss").toString()
+  );
 
   const [registerUser] = useRegisterMutation();
 
   const handleRegisterUser = async () => {
     const res = await registerUser({
-      variables: { email, firstName, lastName, username, password },
+      variables: { email, firstName, lastName, username, password, dateRegistered },
     });
 
     console.log(res);

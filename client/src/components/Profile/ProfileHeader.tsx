@@ -12,6 +12,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { EditProfile } from "./EditProfile";
 import { Link } from "react-router-dom";
 import { useHistory } from 'react-router-dom';
+import moment from "moment";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -179,14 +180,13 @@ export const ProfileHeader: React.FC<Props> = () => {
               to={data.getCurrentUser?.profile.website as string}
               style={{
                 paddingRight: "15px",
-                textDecoration: "none",
+
                 color: "white",
               }}
             >
-              {" "}
-              {data.getCurrentUser?.profile.website}{" "}
+              {data.getCurrentUser?.profile.website}
             </Link>
-            <span> Joined</span>
+            <span> {`Joined ${moment(data.getCurrentUser?.dateRegistered).format("DD/MM/YYYY")}`}</span>
           </Box>
         </Box>
         <Box

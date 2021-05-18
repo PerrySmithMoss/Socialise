@@ -4,7 +4,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
-import { AppBar, Typography } from "@material-ui/core";
+import { AppBar, Avatar, Typography } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -71,11 +71,11 @@ const Navbar = () => {
           ) : data && data.getCurrentUser ? (
             <div>
               <Box display="flex">
-                <Box p={1}>
+                {/* <Box p={1}>
                   <Link className={classes.link} to="bye">
                     <Button color="inherit">Bye</Button>
                   </Link>
-                </Box>
+                </Box> */}
                 <Box>
                   <IconButton
                     aria-label="account of current user"
@@ -84,7 +84,11 @@ const Navbar = () => {
                     onClick={handleMenu}
                     color="inherit"
                   >
-                    <AccountCircle />
+                    <Avatar
+                      style={{ height: "30px", width: "30px" }}
+                      alt="Remy Sharp"
+                      src={data.getCurrentUser.profile.avatar as string}
+                    />
                   </IconButton>
                   <Menu
                     id="menu-appbar"
@@ -109,7 +113,7 @@ const Navbar = () => {
                     >
                       Profile
                     </MenuItem>
-                    <MenuItem onClick={handleClose}>My account</MenuItem>
+                    <MenuItem onClick={handleClose}>My Account</MenuItem>
                     <MenuItem
                       onClick={async () => {
                         await logUserOut();

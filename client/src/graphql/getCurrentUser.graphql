@@ -5,6 +5,7 @@ query GetCurrentUser {
     lastName
     email
     username
+    dateRegistered
     followersCount
     followingCount
     following {
