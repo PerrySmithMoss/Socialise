@@ -35,7 +35,7 @@ export class MessageResolver {
       const payload: any = verify(token, process.env.ACCESS_KEY!);
       const userId = payload.userId;
       console.log("Your user id is:" + payload.userId);
-      
+
       const allUserMessages = await Message.find({
         relations: ["from", "from.profile", "to", "to.profile"],
         where: [
@@ -62,8 +62,13 @@ export class MessageResolver {
       // 2. Starting from the 2nd element in the toIds array
       // 3. Checks if current message.fromId is NOT in the array of remaining toIds
       // 5. If true then remove the message, if false leave the message in array
+
+      // Array.filter() removes all duplicate objects by checking if the previously mapped 
+      // id-array includes the current id ({id} destructs the object into only its id). 
+      // To only filter out actual duplicates, it is using Array.includes()'s second parameter 
+      // fromIndex with index + 1 which will ignore the current object and all previous.
       let filtered = allUserMessages.filter(
-        (message, index) => !toIds.includes(message.fromId, index + 1) 
+        (message, index) => !toIds.includes(message.fromId, index + 1)
       );
 
       return filtered;
