@@ -139,7 +139,7 @@ export const ListOfPosts: React.FC = () => {
                   <Typography
                     variant="h6"
                     style={{ fontSize: "16px", color: "white" }}
-                  >{`${post.firstName}${post.lastName} @${post.userName} 
+                  >{`${post.firstName} ${post.lastName} @${post.userName} 
               - ${moment(post.datePublished).fromNow()}`}</Typography>
                 }
                 secondary={<React.Fragment>{`${post.content}`}</React.Fragment>}

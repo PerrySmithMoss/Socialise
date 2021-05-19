@@ -15,12 +15,8 @@ import { MyContext } from "../../Types/MyContext";
 import { verify } from "jsonwebtoken";
 import { Users } from "../../Entities/Users";
 import { Message } from "../../Entities/Message";
-import { In, Not } from "typeorm";
+import { getRepository, In, Not } from "typeorm";
 import { isAuth } from "../../auth/middleware/isAuth";
-
-// import { PubSub } from "apollo-server-express";
-
-// const pubsub = new PubSub();
 
 @Resolver()
 export class MessageResolver {
@@ -39,25 +35,38 @@ export class MessageResolver {
       const payload: any = verify(token, process.env.ACCESS_KEY!);
       const userId = payload.userId;
       console.log("Your user id is:" + payload.userId);
-
-      // let users = await Users.find({
-      //   where: { id: Not(userId) }
-      // })
-
+      
       const allUserMessages = await Message.find({
         relations: ["from", "from.profile", "to", "to.profile"],
         where: [
           {
             toId: userId,
           },
+          {
+            fromId: userId,
+          },
         ],
         order: {
           dateSent: "DESC",
         },
-        take: 1
+        // take: 1
       });
 
-      return allUserMessages;
+      // let fromIds = allUserMessages.map((o) => o.fromId);
+      // console.log(fromIds);
+
+      let toIds = allUserMessages.map((o) => o.toId);
+      // console.log(toIds);
+
+      // 1. Loops through allUserMessages
+      // 2. Starting from the 2nd element in the toIds array
+      // 3. Checks if current message.fromId is NOT in the array of remaining toIds
+      // 5. If true then remove the message, if false leave the message in array
+      let filtered = allUserMessages.filter(
+        (message, index) => !toIds.includes(message.fromId, index + 1) 
+      );
+
+      return filtered;
     } catch (err) {
       console.log(err);
     }
@@ -69,7 +78,6 @@ export class MessageResolver {
     @Arg("fromId", () => Int) fromId: number
   ) {
     const authorization = context.req.headers["authorization"];
-    console.log(authorization);
 
     if (!authorization) {
       console.log("You're not authorized");
@@ -95,8 +103,6 @@ export class MessageResolver {
         where: [
           {
             fromId: In([userId, fromId]),
-          },
-          {
             toId: In([userId, fromId]),
           },
         ],
@@ -122,7 +128,6 @@ export class MessageResolver {
     @Ctx() context: MyContext
   ) {
     const authorization = context.req.headers["authorization"];
-    console.log(authorization);
     try {
       const token = authorization!.split(" ")[1];
       const payload: any = verify(token, process.env.ACCESS_KEY!);
@@ -139,26 +144,24 @@ export class MessageResolver {
         throw new Error("Message is empty...");
       }
 
-      const sentMessage = await Message.create
-      ({
+      const sentMessage = await Message.create({
         fromId: userId,
         toId: toId,
         dateSent: dateSent,
         content: content,
       }).save();
-      
+
       // console.log(sentMessage)
-      pubsub.publish("NEW_MESSAGE", sentMessage );
+      pubsub.publish("NEW_MESSAGE", sentMessage);
 
       return sentMessage;
-
     } catch (err) {
       console.log(err);
     }
     // return true;
   }
 
-  @Subscription({ 
+  @Subscription({
     topics: "NEW_MESSAGE",
     // filter: ({payload, args}) => payload.toId === args.toId ? true : false
   })

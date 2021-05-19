@@ -547,7 +547,7 @@ export type GetSpecificUserInfoQuery = (
   { __typename?: 'Query' }
   & { getSpecificUserInfo: (
     { __typename?: 'Users' }
-    & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username' | 'followingCount' | 'followersCount'>
+    & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username' | 'dateRegistered' | 'followingCount' | 'followersCount'>
     & { following: Array<(
       { __typename?: 'Following' }
       & Pick<Following, 'id' | 'username' | 'followerId' | 'followingId'>
@@ -1360,6 +1360,7 @@ export const GetSpecificUserInfoDocument = gql`
     firstName
     lastName
     username
+    dateRegistered
     followingCount
     followersCount
     following {

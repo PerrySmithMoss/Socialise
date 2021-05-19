@@ -4,6 +4,7 @@ query GetSpecificUserInfo($userId: Int!) {
     firstName
     lastName
     username
+    dateRegistered
     followingCount
     followersCount
     following {

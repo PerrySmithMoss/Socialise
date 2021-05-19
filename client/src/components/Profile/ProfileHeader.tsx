@@ -8,10 +8,10 @@ import { useGetCurrentUserQuery } from "../../generated/graphql";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import IconButton from "@material-ui/core/IconButton";
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { EditProfile } from "./EditProfile";
 import { Link } from "react-router-dom";
-import { useHistory } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
 import moment from "moment";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -94,7 +94,11 @@ export const ProfileHeader: React.FC<Props> = () => {
     <div className={classes.root}>
       <Box display="flex" pl={2} bgcolor="background.paper">
         <Box mt={1}>
-          <IconButton onClick={() => history.goBack()} style={{ color: "#14ffec", paddingTop: "15px" }} aria-label="delete">
+          <IconButton
+            onClick={() => history.goBack()}
+            style={{ color: "#14ffec", paddingTop: "15px" }}
+            aria-label="delete"
+          >
             <ArrowBackIcon fontSize="small" />
           </IconButton>
         </Box>
@@ -158,7 +162,9 @@ export const ProfileHeader: React.FC<Props> = () => {
           </Box>
 
           <Box pb={1} flexGrow={1}>
-            <span>@{data.getCurrentUser?.username}</span>
+            <span style={{ opacity: 0.5 }}>
+              @{data.getCurrentUser?.username}
+            </span>
           </Box>
 
           <Box pb={3} flexGrow={1}>
@@ -173,9 +179,23 @@ export const ProfileHeader: React.FC<Props> = () => {
           bgcolor="background.paper"
         >
           <Box flexGrow={1}>
-            <span style={{ paddingRight: "15px", textDecoration: "none" }}>
+            <span style={{ paddingRight: "15px", opacity: 0.5 }}>
+              {" "}
+              {`Joined ${moment(data.getCurrentUser?.dateRegistered).format(
+                "DD/MM/YYYY"
+              )}`}
+            </span>
+
+            <span
+              style={{
+                paddingRight: "15px",
+                textDecoration: "none",
+                opacity: 0.5,
+              }}
+            >
               {data.getCurrentUser?.profile.location}{" "}
             </span>
+
             <Link
               to={data.getCurrentUser?.profile.website as string}
               style={{
@@ -184,9 +204,10 @@ export const ProfileHeader: React.FC<Props> = () => {
                 color: "white",
               }}
             >
-              {data.getCurrentUser?.profile.website}
+              <span style={{ color: "#1DA1F2" }}>
+                {data.getCurrentUser?.profile.website}
+              </span>
             </Link>
-            <span> {`Joined ${moment(data.getCurrentUser?.dateRegistered).format("DD/MM/YYYY")}`}</span>
           </Box>
         </Box>
         <Box
@@ -201,11 +222,11 @@ export const ProfileHeader: React.FC<Props> = () => {
             <span style={{ fontWeight: "bold" }}>
               {data.getCurrentUser?.followingCount}{" "}
             </span>
-            <span style={{ paddingRight: "15px" }}> Following </span>
+            <span style={{ paddingRight: "15px", opacity: 0.5}}> Following </span>
             <span style={{ fontWeight: "bold" }}>
-              {data.getCurrentUser?.followersCount}{" "}
+              {data.getCurrentUser?.followersCount}
             </span>
-            <span> Followers</span>
+            <span style={{opacity: 0.5}}> Followers</span>
           </Box>
         </Box>
         <Box flexGrow={1}>

@@ -20,6 +20,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import { FollowUser } from "./FollowUser";
 import CloseIcon from "@material-ui/icons/Close";
+import moment from "moment";
+import { MessageUser } from "./MessageUser";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -152,7 +154,8 @@ export const SingleUserHeader: React.FC<Props> = ({ location }) => {
               src={data.getSpecificUserInfo?.profile.avatar as string}
             />
           </Box>
-            <FollowUser specificUser={data.getSpecificUserInfo}/>
+          <MessageUser specificUser={data.getSpecificUserInfo} />
+          <FollowUser specificUser={data.getSpecificUserInfo} />
         </Box>
         <Box pl={2} bgcolor="background.paper">
           <Box pb={0.2} flexGrow={1}>
@@ -162,7 +165,9 @@ export const SingleUserHeader: React.FC<Props> = ({ location }) => {
           </Box>
 
           <Box pb={1} flexGrow={1}>
-            <span>@{data.getSpecificUserInfo?.username}</span>
+            <span style={{ opacity: 0.5 }}>
+              @{data.getSpecificUserInfo?.username}
+            </span>
           </Box>
 
           <Box pb={3} flexGrow={1}>
@@ -177,21 +182,35 @@ export const SingleUserHeader: React.FC<Props> = ({ location }) => {
           bgcolor="background.paper"
         >
           <Box flexGrow={1}>
-            <span style={{ paddingRight: "15px", textDecoration: "none" }}>
+            <span style={{ paddingRight: "15px", opacity: 0.5 }}>
+              {" "}
+              {`Joined ${moment(
+                data.getSpecificUserInfo?.dateRegistered
+              ).format("DD/MM/YYYY")}`}
+            </span>
+
+            <span
+              style={{
+                paddingRight: "15px",
+                textDecoration: "none",
+                opacity: 0.5,
+              }}
+            >
               {data.getSpecificUserInfo?.profile.location}{" "}
             </span>
+
             <Link
               to={data.getSpecificUserInfo?.profile.website as string}
               style={{
                 paddingRight: "15px",
-                textDecoration: "none",
                 color: "white",
+                textDecoration: "none",
               }}
             >
-              {" "}
-              {data.getSpecificUserInfo?.profile.website}{" "}
+              <span style={{ color: "#1DA1F2" }}>
+                {data.getSpecificUserInfo?.profile.website}
+              </span>
             </Link>
-            <span> Joined</span>
           </Box>
         </Box>
         <Box
@@ -206,11 +225,14 @@ export const SingleUserHeader: React.FC<Props> = ({ location }) => {
             <span style={{ fontWeight: "bold" }}>
               {data.getSpecificUserInfo?.followingCount}{" "}
             </span>
-            <span style={{ paddingRight: "15px" }}> Following </span>
+            <span style={{ paddingRight: "15px", opacity: 0.5 }}>
+              {" "}
+              Following{" "}
+            </span>
             <span style={{ fontWeight: "bold" }}>
               {data.getSpecificUserInfo?.followersCount}{" "}
             </span>
-            <span> Followers</span>
+            <span style={{ opacity: 0.5 }}> Followers</span>
           </Box>
         </Box>
         <Box flexGrow={1}>

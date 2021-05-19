@@ -14,6 +14,7 @@ import {
   useGetAllUserMessagesQuery,
   useGetAllMessagesFromUserQuery,
   useNewMessageSubscription,
+  useGetCurrentUserQuery,
 } from "../../generated/graphql";
 import { Box, Divider } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
@@ -95,14 +96,17 @@ export const MessagesList: React.FC<Props> = () => {
   const { data: allMessages } = useGetAllUserMessagesQuery({
     fetchPolicy: "cache-and-network",
   });
+  const { data: currentUser, loading } = useGetCurrentUserQuery({
+    fetchPolicy: "cache-first",
+  });
   // const { data: getMessagesFromUser } = useGetAllMessagesFromUserQuery({ fetchPolicy: "network-only" });
 
   const [
     getAllMessagesFromUser,
-    { loading: messagesLoading, data: messagesData},
+    { loading: messagesLoading, data: messagesData },
   ] = useLazyQuery(GET_MESSAGES);
 
-  // const 
+  // const
   //   { loading, data, subscribeToMore}
   //  = useQuery(GET_MESSAGES);
 
@@ -111,6 +115,7 @@ export const MessagesList: React.FC<Props> = () => {
   const handleSelectedUserClick = (fromId: number) => {};
 
   useEffect(() => {
+    console.log(allMessages)
     if (selectedUserId) {
       getAllMessagesFromUser({
         variables: {
@@ -142,8 +147,7 @@ export const MessagesList: React.FC<Props> = () => {
     <>
       <Grid item className={classes.grid}>
         <div className={classes.test}>
-          <Box 
-          width={305} display="flex" pl={2} bgcolor="background.paper">
+          <Box width={305} display="flex" pl={2} bgcolor="background.paper">
             <Box flexGrow={1}>
               <h2>Messages</h2>
             </Box>
@@ -169,17 +173,33 @@ export const MessagesList: React.FC<Props> = () => {
               <ListItem
                 //    key={post.id}
                 button
-                onClick={() => setSelectedUserId(message.from.id)}
+                onClick={
+                  currentUser?.getCurrentUser?.id === message.to.id
+                    ? () => setSelectedUserId(message.from.id)
+                    : () => setSelectedUserId(message.to.id)
+                }
+                // () => setSelectedUserId(message.to.id)}
                 // component={Link}
                 //  to={{ pathname: `/messages/${message.id}`, state: {message} }}
                 // to={{ pathname: `/messages/${2}` }}
                 alignItems="flex-start"
               >
                 <ListItemAvatar>
-                  <Avatar alt="Remy Sharp" src={message.from.profile.avatar} />
+                  <Avatar
+                    alt="Remy Sharp"
+                    src={
+                      currentUser?.getCurrentUser?.id === message.to.id
+                        ? `${message.from.profile.avatar as string}`
+                        : `${message.to.profile.avatar as string}`
+                    }
+                  />
                 </ListItemAvatar>
                 <ListItemText
-                  primary={`${message.from.firstName} ${message.from.lastName}`}
+                  primary={
+                    currentUser?.getCurrentUser?.id === message.to.id
+                      ? `${message.from.firstName} ${message.from.lastName}`
+                      : `${message.to.firstName} ${message.to.lastName}`
+                  }
                   secondary={
                     <React.Fragment>
                       <Typography
@@ -200,10 +220,10 @@ export const MessagesList: React.FC<Props> = () => {
       </Grid>
 
       {messagesData && messagesData.getAllMessagesFromUser.length > 0 ? (
-        <Message messagesData={messagesData} selectedUserId={selectedUserId}/>
+        <Message messagesData={messagesData} selectedUserId={selectedUserId} />
       ) : (
         <Grid item className={classes.grid}>
-          <div className={classes.test}> 
+          <div className={classes.test}>
             <Box
               width={430}
               display="flex"
