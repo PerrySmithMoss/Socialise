@@ -64,8 +64,8 @@ export class MessageResolver {
       // 5. If true then remove the message, if false leave the message in array
 
       // Array.filter() removes all duplicate objects by checking if the previously mapped 
-      // id-array includes the current id ({id} destructs the object into only its id). 
-      // To only filter out actual duplicates, it is using Array.includes()'s second parameter 
+      // toIds-array includes the current fromId. 
+      // To only filter out actual duplicate messages, it is using Array.includes()'s second parameter 
       // fromIndex with index + 1 which will ignore the current object and all previous.
       let filtered = allUserMessages.filter(
         (message, index) => !toIds.includes(message.fromId, index + 1)

@@ -66,14 +66,20 @@ export const ListOfPosts: React.FC = () => {
       },
     },
   });
+  const [postIdToDelete, setPostIdToDelete] = useState<Number>();
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    postId: number
+  ) => {
+    setPostIdToDelete(postId);
     setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   if (!data) {
     return (
       <div style={{ width: "100%" }}>
@@ -93,9 +99,17 @@ export const ListOfPosts: React.FC = () => {
   }
 
   const handleCommentClickOpen = (post: any) => {
-    // console.log(post)
     setSinglePost(post);
     setOpenCommentDialog(true);
+  };
+
+  const handleDeletePost = async () => {
+    // console.log("Post ID to delete: ", postIdToDelete)
+    await deletePost({
+      variables: { postID: postIdToDelete as number },
+      refetchQueries: [{ query: GetAllPostsDocument }],
+    });
+    setAnchorEl(null);
   };
 
   const handleCommentClickClose = () => {
@@ -174,7 +188,7 @@ export const ListOfPosts: React.FC = () => {
                   aria-label="settings"
                   aria-controls="simple-menu"
                   aria-haspopup="true"
-                  onClick={handleClick}
+                  onClick={(e) => handleClick(e, post.id)}
                 >
                   <MoreVertIcon />
                 </IconButton>
@@ -185,15 +199,7 @@ export const ListOfPosts: React.FC = () => {
                   open={Boolean(anchorEl)}
                   onClose={handleClose}
                 >
-                  <MenuItem
-                    style={{ color: "red" }}
-                    onClick={async () => {
-                      await deletePost({
-                        variables: { postID: post.postID },
-                        refetchQueries: [{ query: GetAllPostsDocument }],
-                      });
-                    }}
-                  >
+                  <MenuItem style={{ color: "red" }} onClick={handleDeletePost}>
                     Delete post <DeleteIcon />
                   </MenuItem>
                   <Divider></Divider>
