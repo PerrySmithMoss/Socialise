@@ -4,6 +4,8 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { Box, Button, Divider, Modal } from "@material-ui/core";
 import Avatar from "@material-ui/core/Avatar";
 import ProfileBanner from "../../img/profile-banner.jpg";
+import DexterBackground1 from "../../img/dexter-background.jpg";
+import DexterBackground2 from "../../img/dexter-background2.jpeg";
 import { useGetCurrentUserQuery } from "../../generated/graphql";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
