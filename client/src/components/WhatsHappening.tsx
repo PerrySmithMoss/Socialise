@@ -50,8 +50,8 @@ export const WhatsHappening: React.FC = () => {
     fetchPolicy: "cache-first",
   });
   if (Posts && User) {
-    console.log(Posts);
-    console.log(User);
+    // console.log(Posts);
+    // console.log(User);
   }
   const [content, setContent] = useState("");
   const [datePublished, setDatePublished] = useState(

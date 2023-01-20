@@ -10,6 +10,7 @@ import { TrendsForYou } from "../components/TrendsForYou";
 import { LeftNav } from "../components/Home/LeftNav";
 import { YouMayKnow } from "../components/Home/YouMayKnow";
 import { ListOfUsers } from "../components/ListOfUsers";
+import { Hidden } from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -21,8 +22,11 @@ const useStyles = makeStyles((theme: Theme) =>
       width: 300,
     },
     grid: {
-      marginTop: 25
-    }
+      marginTop: 25,
+    },
+    columnThree: {
+      marginTop: 25,
+    },
   })
 );
 
@@ -35,9 +39,11 @@ export const Home: React.FC<Props> = () => {
     <Grid container className={classes.root} spacing={2}>
       <Grid item xs={12}>
         <Grid container justify="center" spacing={spacing}>
-          <Grid item className={classes.grid}>
-        <LeftNav />
-          </Grid>
+          <Hidden smDown>
+            <Grid item className={classes.grid}>
+              <LeftNav />
+            </Grid>
+          </Hidden>
 
           <Grid item className={classes.grid}>
             <WhatsHappening />
@@ -45,13 +51,15 @@ export const Home: React.FC<Props> = () => {
             <ListOfPosts />
           </Grid>
 
-          <Grid item className={classes.grid}>
-            <SearchBar />
-            <br></br>
-            <TrendsForYou />
-            <br></br>
-            <YouMayKnow />
-          </Grid>
+          <Hidden mdDown>
+            <Grid item className={classes.columnThree}>
+              <SearchBar />
+              <br></br>
+              <TrendsForYou />
+              <br></br>
+              <YouMayKnow />
+            </Grid>
+          </Hidden>
         </Grid>
       </Grid>
     </Grid>
