@@ -120,6 +120,35 @@ export class PostResolver {
     }
   }
 
+  @Query(() => Post)
+  async getPostById(@Arg("postId", () => Int) postId: number) {
+    try {
+      const post = await Post.findOne({
+        relations: [
+          "likes",
+          "retweets",
+          "user",
+          "user.profile",
+          "comments",
+          "comments.user",
+          "comments.user.profile",
+        ],
+        where: {
+          id: postId,
+        },
+      });
+
+      if (!post) {
+        return null;
+      }
+
+      return post;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
   @Mutation(() => Boolean)
   async createPost(
     @Ctx() context: MyContext,

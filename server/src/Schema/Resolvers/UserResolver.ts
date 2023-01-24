@@ -36,8 +36,8 @@ class ProfileUpdateInput {
   @Field(() => String, { nullable: true })
   website?: string;
 
-  @Field(() => String, { nullable: true })
-  avatar?: string;
+  // @Field(() => String, { nullable: true })
+  // avatar?: string;
 }
 
 @ObjectType()
@@ -84,7 +84,6 @@ export class UserResolver {
   @Query(() => Users, { nullable: true })
   async getCurrentUser(@Ctx() context: MyContext) {
     const authorization = context.req.headers["authorization"];
-    console.log(authorization);
 
     if (!authorization) {
       console.log("You're not authorized");
@@ -94,23 +93,10 @@ export class UserResolver {
     try {
       const token = authorization.split(" ")[1];
       const payload: any = verify(token, process.env.ACCESS_KEY!);
-      console.log("Your payload is:" + payload);
 
-      // const user = await Users.findOne(16, {relations: ["profile"]})
-      // console.log(user)
       return await Users.findOne(payload.userId, {
         relations: ["profile", "following", "follower"],
       });
-
-      // const qb = getConnection()
-      // .getRepository(Users)
-      // .createQueryBuilder("user")
-      // .leftJoinAndSelect("user.profile", "profile", "profile.id = profile.userId")
-      // .where("user.id = :id", { id: payload.userId })
-
-      // const user = await qb.getOneOrFail();
-      // console.log(user)
-      // return user
     } catch (e) {
       console.log(e);
       return null;
@@ -127,12 +113,17 @@ export class UserResolver {
         relations: ["profile"],
       });
 
-      await Profile.update({ id: user.profileId }, input);
+      const update = await Profile.update({ id: user.profileId }, input);
+
+      if (!update) {
+        return false;
+      }
+
+      return true;
     } catch (err) {
       console.log(err);
       return false;
     }
-    return true;
   }
 
   @Mutation(() => ImageUploadResponse)
@@ -147,7 +138,7 @@ export class UserResolver {
       const randomString = crypto.randomBytes(20).toString("hex") + ext;
 
       const stream = createReadStream();
-      console.log("Directory: ", __dirname);
+
       const pathNameForServer = path.join(
         __dirname,
         `../../../public/images/${randomString}`
@@ -235,7 +226,7 @@ export class UserResolver {
     await profile.save();
     console.log("Profile: ", profile);
     try {
-      const user = await Users.insert({
+      await Users.insert({
         firstName,
         lastName,
         username,
@@ -244,8 +235,6 @@ export class UserResolver {
         password: hashedPassword,
         profileId: profile.id,
       });
-
-      console.log("User: ", user);
     } catch (err) {
       console.log(err);
       return false;
@@ -278,9 +267,6 @@ export class UserResolver {
         followingId: followingId,
         followerId: userId,
       });
-
-      // console.log(sentMessage)
-
       return true;
     } catch (err) {
       console.log(err);

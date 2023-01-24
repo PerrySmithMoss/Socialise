@@ -1,0 +1,45 @@
+query GetPostById($postId: Int!) {
+  getPostById(postId: $postId) {
+    id
+    userId
+    firstName
+    lastName
+    content
+    voteStatus
+    retweetsCount
+    likes {
+      userId
+    }
+    retweets {
+      userId
+    }
+    comments {
+      comment
+      datePublished
+      user {
+        id
+        firstName
+        lastName
+        username
+        profile {
+          avatar
+        }
+      }
+    }
+    user {
+      id
+      firstName
+      lastName
+      username
+      email
+      profile {
+        id
+        avatar
+      }
+    }
+    datePublished
+    userName
+    points
+    commentsCount
+  }
+}
