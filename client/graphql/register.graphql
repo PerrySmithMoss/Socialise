@@ -4,7 +4,7 @@ mutation Register(
   $lastName: String!
   $username: String!
   $password: String!
-  $dateRegistered: DateTime!
+  $dateRegistered: String!
 ) {
   registerUser(
     email: $email
@@ -13,5 +13,20 @@ mutation Register(
     username: $username
     password: $password
     dateRegistered: $dateRegistered
-  )
+  ) {
+    errors {
+      field
+      message
+    }
+    data {
+      accessToken
+      user {
+        id
+        firstName
+        lastName
+        email
+        username
+      }
+    }
+  }
 }

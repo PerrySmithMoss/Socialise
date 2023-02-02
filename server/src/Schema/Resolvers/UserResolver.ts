@@ -15,7 +15,7 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import { getConnection, Like } from "typeorm";
+import { getConnection, Like, Not } from "typeorm";
 import { createAccessKey, createRefreshKey } from "../../auth/auth";
 import { isAuth } from "../../auth/middleware/isAuth";
 import { sendRefreshKey } from "../../auth/sendRefreshKey";
@@ -24,6 +24,7 @@ import { Users } from "../../Entities/Users";
 import { MyContext } from "../../Types/MyContext";
 import { GraphQLUpload, FileUpload } from "graphql-upload";
 import { Following } from "../../Entities/Following";
+import { validateEmail } from "../../utils/validateEmail";
 
 @InputType()
 class ProfileUpdateInput {
@@ -49,6 +50,24 @@ class LoginResponse {
 }
 
 @ObjectType()
+class FieldError {
+  @Field()
+  field: string;
+
+  @Field()
+  message: string;
+}
+
+@ObjectType()
+class UserResponse {
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
+
+  @Field(() => LoginResponse, { nullable: true })
+  data?: LoginResponse;
+}
+
+@ObjectType()
 class ImageUploadResponse {
   @Field()
   url!: string;
@@ -64,13 +83,32 @@ export class UserResolver {
   @Query(() => String)
   @UseMiddleware(isAuth)
   bye(@Ctx() { payload }: MyContext) {
-    console.log("Payload:" + payload);
     return `Your user ID is: ${payload!.userId}`;
   }
 
   @Query(() => [Users])
   async getAllUsers() {
     return await Users.find({ relations: ["profile"] });
+  }
+
+  @Query(() => [Users])
+  async getUsersTheLoggedInUserMayKnow(
+    @Arg("userId", () => Int, { nullable: true }) userId?: number
+  ) {
+    if(userId) {
+      return await Users.find({
+        relations: ["profile"],
+        where: { id: Not(userId) },
+        order: { dateRegistered: "DESC" },
+        take: 5,
+      });
+    } else {
+      return await Users.find({
+        relations: ["profile"],
+        order: { dateRegistered: "DESC" },
+        take: 5,
+      });
+    }
   }
 
   @Query(() => Users)
@@ -106,14 +144,20 @@ export class UserResolver {
   @Mutation(() => Boolean)
   async updateProfile(
     @Arg("userId", () => Int) userId: number,
-    @Arg("input", () => ProfileUpdateInput) input: ProfileUpdateInput
+    @Arg("bio", () => String) bio: string,
+    @Arg("location", () => String) location: string,
+    @Arg("website", () => String) website: string
+    // @Arg("input", () => ProfileUpdateInput) input: ProfileUpdateInput
   ) {
     try {
       const user = await Users.findOneOrFail(userId, {
         relations: ["profile"],
       });
 
-      const update = await Profile.update({ id: user.profileId }, input);
+      const update = await Profile.update(
+        { id: user.profileId },
+        { bio, location, website }
+      );
 
       if (!update) {
         return false;
@@ -159,7 +203,6 @@ export class UserResolver {
       return {
         url: err,
       };
-      // return false;
     }
   }
 
@@ -185,47 +228,119 @@ export class UserResolver {
     return true;
   }
 
-  @Mutation(() => LoginResponse)
+  @Mutation(() => UserResponse)
   async loginUser(
     @Arg("email") email: string,
     @Arg("password") password: string,
     @Ctx() { req, res }: MyContext
-  ): Promise<LoginResponse> {
+  ): Promise<UserResponse> {
     const user = await Users.findOne({ where: { email } });
 
     if (!user) {
-      throw new Error("Could not find user...");
+      return {
+        errors: [
+          {
+            field: "email/password",
+            message: "Could not find a user with that email or password.",
+          },
+        ],
+      };
     }
 
     const valid = await compare(password, user.password);
 
     if (!valid) {
-      throw new Error("Passwords did not match...");
+      return {
+        errors: [
+          {
+            field: "email/password",
+            message: "Could not find a user with that email or password.",
+          },
+        ],
+      };
     }
 
     // Login successful
     sendRefreshKey(res, createRefreshKey(user));
 
     return {
-      accessToken: createAccessKey(user),
-      user,
+      data: {
+        accessToken: createAccessKey(user),
+        user,
+      },
     };
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => UserResponse)
   async registerUser(
     @Arg("firstName") firstName: string,
     @Arg("lastName") lastName: string,
     @Arg("username") username: string,
     @Arg("email") email: string,
-    @Arg("dateRegistered") dateRegistered: Date,
-    @Arg("password") password: string
-  ) {
-    const hashedPassword = await hash(password, 13);
-    const profile = Profile.create();
-    await profile.save();
-    console.log("Profile: ", profile);
+    @Arg("dateRegistered") dateRegistered: string,
+    @Arg("password") password: string,
+    @Ctx() { req, res }: MyContext
+  ): Promise<UserResponse> {
+    if (validateEmail(email) === false) {
+      return {
+        errors: [
+          {
+            field: "email",
+            message: "Email provided is not valid.",
+          },
+        ],
+      };
+    }
+    console.log("res: ", res);
+
+    if (password.length < 8) {
+      return {
+        errors: [
+          {
+            field: "password",
+            message: "Password must be 8 characters or greater.",
+          },
+        ],
+      };
+    }
+
+    const checkIfUserNameExists = await Users.findOne({
+      where: { username: username },
+    });
+    if (checkIfUserNameExists) {
+      return {
+        errors: [
+          {
+            field: "username",
+            message:
+              "A user with this username already exists, please choose another one.",
+          },
+        ],
+      };
+    }
+
+    const checkIfEmailExists = await Users.findOne({
+      where: { email: email },
+    });
+    if (checkIfEmailExists) {
+      return {
+        errors: [
+          {
+            field: "email",
+            message:
+              "A user with this email already exists, please choose another one.",
+          },
+        ],
+      };
+    }
+
     try {
+      const hashedPassword = await hash(password, 13);
+
+      const profile = Profile.create();
+
+      await profile.save();
+
       await Users.insert({
         firstName,
         lastName,
@@ -235,11 +350,40 @@ export class UserResolver {
         password: hashedPassword,
         profileId: profile.id,
       });
+
+      const user = await Users.findOne({ where: { email } });
+
+      if (!user) {
+        return {
+          errors: [
+            {
+              field: "email",
+              message: "Could not find user.",
+            },
+          ],
+        };
+      }
+
+      sendRefreshKey(res, createRefreshKey(user));
+
+      // Login successful
+      return {
+        data: {
+          accessToken: createAccessKey(user),
+          user,
+        },
+      };
     } catch (err) {
-      console.log(err);
-      return false;
+      console.log("fail", err);
+      return {
+        errors: [
+          {
+            field: "user",
+            message: "This was an error while trying to register user.",
+          },
+        ],
+      };
     }
-    return true;
   }
 
   @Mutation(() => Boolean)
@@ -250,7 +394,6 @@ export class UserResolver {
     @Ctx() context: MyContext
   ) {
     const authorization = context.req.headers["authorization"];
-    console.log(authorization);
     try {
       const token = authorization!.split(" ")[1];
       const payload: any = verify(token, process.env.ACCESS_KEY!);
@@ -290,7 +433,7 @@ export class UserResolver {
       const userId = payload.userId;
 
       const isFollowing = value !== -1;
-      console.log("isFollowing: ", isFollowing);
+
       const realValue = isFollowing ? 1 : -1;
       console.log("realValue: ", realValue);
 

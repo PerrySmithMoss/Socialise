@@ -8,6 +8,7 @@ import moment from "moment";
 import { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { setAccessKey } from "../auth/accessKey";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,6 +30,7 @@ const Register: NextPage = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
   const [dateRegistered, setDateRegistered] = useState(
     moment().format("YYYY-MM-DD hh:mm:ss").toString()
   );
@@ -36,18 +38,29 @@ const Register: NextPage = () => {
   const [registerUser] = useRegisterMutation();
 
   const handleRegisterUser = async () => {
-    await registerUser({
-      variables: {
-        email,
-        firstName,
-        lastName,
-        username,
-        password,
-        dateRegistered,
-      },
-    });
+    try {
+      const res = await registerUser({
+        variables: {
+          email,
+          firstName,
+          lastName,
+          username,
+          password,
+          dateRegistered,
+        },
+      });
 
-    router.push("/");
+      if (res && res.data?.registerUser.data) {
+        setAccessKey(res.data.registerUser.data?.accessToken);
+        router.push("/");
+      }
+
+      if (res && res.data?.registerUser.errors) {
+        setLoginError(res.data.registerUser.errors[0].message);
+      }
+    } catch (e) {
+      console.log("Err: ", e);
+    }
   };
 
   return (
@@ -136,6 +149,17 @@ const Register: NextPage = () => {
             />
           </Box>
         </Box>
+        {loginError ? (
+          <Box
+            display="flex"
+            justifyContent="center"
+            flexDirection="row"
+            p={1}
+            m={1}
+          >
+            <p className="text-red-500">{loginError}</p>
+          </Box>
+        ) : null}
         <Box
           display="flex"
           justifyContent="center"

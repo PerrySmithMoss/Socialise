@@ -46,6 +46,8 @@ const Navbar = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  console.log(data)
   return (
       <AppBar position="static" color="inherit">
         <Toolbar>

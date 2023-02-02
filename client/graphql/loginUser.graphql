@@ -1,12 +1,18 @@
 mutation Login($email: String!, $password: String!) {
   loginUser(email: $email, password: $password) {
-    accessToken
-    user {
-      id
-      firstName
-      lastName
-      email
-      username
+    errors {
+      field
+      message
+    }
+    data {
+      accessToken
+      user {
+        id
+        firstName
+        lastName
+        email
+        username
+      }
     }
   }
 }

@@ -137,7 +137,7 @@ export const EditProfile: React.FC<Props> = ({ open, setOpen }) => {
       aria-describedby="transition-modal-description"
       className={classes.modal}
       open={open}
-      onClose={() => handleClose}
+      onClose={handleClose}
       closeAfterTransition
       BackdropComponent={Backdrop}
       BackdropProps={{
@@ -148,7 +148,11 @@ export const EditProfile: React.FC<Props> = ({ open, setOpen }) => {
         <div className={classes.paper}>
           <Box display="flex" alignItems="center" bgcolor="background.paper">
             <Box>
-              <IconButton onClick={() => handleClose} style={{ color: "#14ffec" }} aria-label="delete">
+              <IconButton
+                onClick={handleClose}
+                style={{ color: "#14ffec" }}
+                aria-label="delete"
+              >
                 <CloseIcon fontSize="large" />
               </IconButton>
             </Box>
@@ -162,7 +166,9 @@ export const EditProfile: React.FC<Props> = ({ open, setOpen }) => {
                   updateProfile({
                     variables: {
                       userId: data.getCurrentUser?.id as number,
-                      input: { bio: bio, location: location, website: website },
+                      bio: bio || "",
+                      location: location || "",
+                      website: website || "",
                     },
                     refetchQueries: [{ query: GetCurrentUserDocument }],
                   })

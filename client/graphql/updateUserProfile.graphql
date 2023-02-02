@@ -1,9 +1,13 @@
 mutation UpdateUserProfile(
   $userId: Int!
-  $input: ProfileUpdateInput!
+  $bio: String!
+  $website: String!
+  $location: String!
 ) {
   updateProfile(
     userId: $userId
-    input: $input
+    bio: $bio
+    website: $website
+    location: $location
   )
 }

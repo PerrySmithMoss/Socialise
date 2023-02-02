@@ -85,7 +85,7 @@ export const LeftNav: React.FC = () => {
             </Box>
             <Box ml={3} flexGrow={1}>
               <div className={classes.link}>
-                <Link href={`/profile`}>
+                <Link href={`/user/${currentUser.getCurrentUser.id}`}>
                   <Button
                     style={{
                       color:

@@ -28,6 +28,12 @@ export type Comment = {
 };
 
 
+export type FieldError = {
+  __typename?: 'FieldError';
+  field: Scalars['String'];
+  message: Scalars['String'];
+};
+
 export type Following = {
   __typename?: 'Following';
   id: Scalars['Int'];
@@ -74,8 +80,8 @@ export type Mutation = {
   logUserOut: Scalars['Boolean'];
   deleteUser: Scalars['Boolean'];
   revokeRefreshTokensForUser: Scalars['Boolean'];
-  loginUser: LoginResponse;
-  registerUser: Scalars['Boolean'];
+  loginUser: UserResponse;
+  registerUser: UserResponse;
   followUserV2: Scalars['Boolean'];
   followUser: Scalars['Boolean'];
   sendMessage: Message;
@@ -88,7 +94,9 @@ export type Mutation = {
 
 
 export type MutationUpdateProfileArgs = {
-  input: ProfileUpdateInput;
+  website: Scalars['String'];
+  location: Scalars['String'];
+  bio: Scalars['String'];
   userId: Scalars['Int'];
 };
 
@@ -117,7 +125,7 @@ export type MutationLoginUserArgs = {
 
 export type MutationRegisterUserArgs = {
   password: Scalars['String'];
-  dateRegistered: Scalars['DateTime'];
+  dateRegistered: Scalars['String'];
   email: Scalars['String'];
   username: Scalars['String'];
   lastName: Scalars['String'];
@@ -206,17 +214,12 @@ export type Profile = {
   user: Users;
 };
 
-export type ProfileUpdateInput = {
-  bio?: Maybe<Scalars['String']>;
-  location?: Maybe<Scalars['String']>;
-  website?: Maybe<Scalars['String']>;
-};
-
 export type Query = {
   __typename?: 'Query';
   hello: Scalars['String'];
   bye: Scalars['String'];
   getAllUsers: Array<Users>;
+  getUsersTheLoggedInUserMayKnow: Array<Users>;
   getSpecificUserInfo: Users;
   getCurrentUser?: Maybe<Users>;
   searchUsers: Array<Users>;
@@ -226,6 +229,11 @@ export type Query = {
   getAllUserPosts: Array<Post>;
   getAllSpecificUserPosts: Array<Post>;
   getPostById: Post;
+};
+
+
+export type QueryGetUsersTheLoggedInUserMayKnowArgs = {
+  userId?: Maybe<Scalars['Int']>;
 };
 
 
@@ -266,6 +274,12 @@ export type Subscription = {
   newMessage: Message;
 };
 
+
+export type UserResponse = {
+  __typename?: 'UserResponse';
+  errors?: Maybe<Array<FieldError>>;
+  data?: Maybe<LoginResponse>;
+};
 
 export type Users = {
   __typename?: 'Users';
@@ -640,6 +654,23 @@ export type GetAllUserPostsQuery = (
   )> }
 );
 
+export type GetUsersTheLoggedInUserMayKnowQueryVariables = Exact<{
+  userId?: Maybe<Scalars['Int']>;
+}>;
+
+
+export type GetUsersTheLoggedInUserMayKnowQuery = (
+  { __typename?: 'Query' }
+  & { getUsersTheLoggedInUserMayKnow: Array<(
+    { __typename?: 'Users' }
+    & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username'>
+    & { profile: (
+      { __typename?: 'Profile' }
+      & Pick<Profile, 'avatar'>
+    ) }
+  )> }
+);
+
 export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -676,12 +707,18 @@ export type LoginMutationVariables = Exact<{
 export type LoginMutation = (
   { __typename?: 'Mutation' }
   & { loginUser: (
-    { __typename?: 'LoginResponse' }
-    & Pick<LoginResponse, 'accessToken'>
-    & { user: (
-      { __typename?: 'Users' }
-      & Pick<Users, 'id' | 'firstName' | 'lastName' | 'email' | 'username'>
-    ) }
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>>, data?: Maybe<(
+      { __typename?: 'LoginResponse' }
+      & Pick<LoginResponse, 'accessToken'>
+      & { user: (
+        { __typename?: 'Users' }
+        & Pick<Users, 'id' | 'firstName' | 'lastName' | 'email' | 'username'>
+      ) }
+    )> }
   ) }
 );
 
@@ -702,13 +739,26 @@ export type RegisterMutationVariables = Exact<{
   lastName: Scalars['String'];
   username: Scalars['String'];
   password: Scalars['String'];
-  dateRegistered: Scalars['DateTime'];
+  dateRegistered: Scalars['String'];
 }>;
 
 
 export type RegisterMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Mutation, 'registerUser'>
+  & { registerUser: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>>, data?: Maybe<(
+      { __typename?: 'LoginResponse' }
+      & Pick<LoginResponse, 'accessToken'>
+      & { user: (
+        { __typename?: 'Users' }
+        & Pick<Users, 'id' | 'firstName' | 'lastName' | 'email' | 'username'>
+      ) }
+    )> }
+  ) }
 );
 
 export type RetweetPostMutationVariables = Exact<{
@@ -762,7 +812,9 @@ export type SendMessageMutation = (
 
 export type UpdateUserProfileMutationVariables = Exact<{
   userId: Scalars['Int'];
-  input: ProfileUpdateInput;
+  bio: Scalars['String'];
+  website: Scalars['String'];
+  location: Scalars['String'];
 }>;
 
 
@@ -1602,6 +1654,47 @@ export function useGetAllUserPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
 export type GetAllUserPostsQueryHookResult = ReturnType<typeof useGetAllUserPostsQuery>;
 export type GetAllUserPostsLazyQueryHookResult = ReturnType<typeof useGetAllUserPostsLazyQuery>;
 export type GetAllUserPostsQueryResult = Apollo.QueryResult<GetAllUserPostsQuery, GetAllUserPostsQueryVariables>;
+export const GetUsersTheLoggedInUserMayKnowDocument = gql`
+    query getUsersTheLoggedInUserMayKnow($userId: Int) {
+  getUsersTheLoggedInUserMayKnow(userId: $userId) {
+    id
+    firstName
+    lastName
+    username
+    profile {
+      avatar
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUsersTheLoggedInUserMayKnowQuery__
+ *
+ * To run a query within a React component, call `useGetUsersTheLoggedInUserMayKnowQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersTheLoggedInUserMayKnowQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersTheLoggedInUserMayKnowQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetUsersTheLoggedInUserMayKnowQuery(baseOptions?: Apollo.QueryHookOptions<GetUsersTheLoggedInUserMayKnowQuery, GetUsersTheLoggedInUserMayKnowQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUsersTheLoggedInUserMayKnowQuery, GetUsersTheLoggedInUserMayKnowQueryVariables>(GetUsersTheLoggedInUserMayKnowDocument, options);
+      }
+export function useGetUsersTheLoggedInUserMayKnowLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUsersTheLoggedInUserMayKnowQuery, GetUsersTheLoggedInUserMayKnowQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUsersTheLoggedInUserMayKnowQuery, GetUsersTheLoggedInUserMayKnowQueryVariables>(GetUsersTheLoggedInUserMayKnowDocument, options);
+        }
+export type GetUsersTheLoggedInUserMayKnowQueryHookResult = ReturnType<typeof useGetUsersTheLoggedInUserMayKnowQuery>;
+export type GetUsersTheLoggedInUserMayKnowLazyQueryHookResult = ReturnType<typeof useGetUsersTheLoggedInUserMayKnowLazyQuery>;
+export type GetUsersTheLoggedInUserMayKnowQueryResult = Apollo.QueryResult<GetUsersTheLoggedInUserMayKnowQuery, GetUsersTheLoggedInUserMayKnowQueryVariables>;
 export const HelloDocument = gql`
     query Hello {
   hello
@@ -1699,13 +1792,19 @@ export type LogUserOutMutationOptions = Apollo.BaseMutationOptions<LogUserOutMut
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   loginUser(email: $email, password: $password) {
-    accessToken
-    user {
-      id
-      firstName
-      lastName
-      email
-      username
+    errors {
+      field
+      message
+    }
+    data {
+      accessToken
+      user {
+        id
+        firstName
+        lastName
+        email
+        username
+      }
     }
   }
 }
@@ -1771,7 +1870,7 @@ export function useNewMessageSubscription(baseOptions?: Apollo.SubscriptionHookO
 export type NewMessageSubscriptionHookResult = ReturnType<typeof useNewMessageSubscription>;
 export type NewMessageSubscriptionResult = Apollo.SubscriptionResult<NewMessageSubscription>;
 export const RegisterDocument = gql`
-    mutation Register($email: String!, $firstName: String!, $lastName: String!, $username: String!, $password: String!, $dateRegistered: DateTime!) {
+    mutation Register($email: String!, $firstName: String!, $lastName: String!, $username: String!, $password: String!, $dateRegistered: String!) {
   registerUser(
     email: $email
     firstName: $firstName
@@ -1779,7 +1878,22 @@ export const RegisterDocument = gql`
     username: $username
     password: $password
     dateRegistered: $dateRegistered
-  )
+  ) {
+    errors {
+      field
+      message
+    }
+    data {
+      accessToken
+      user {
+        id
+        firstName
+        lastName
+        email
+        username
+      }
+    }
+  }
 }
     `;
 export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
@@ -1943,8 +2057,13 @@ export type SendMessageMutationHookResult = ReturnType<typeof useSendMessageMuta
 export type SendMessageMutationResult = Apollo.MutationResult<SendMessageMutation>;
 export type SendMessageMutationOptions = Apollo.BaseMutationOptions<SendMessageMutation, SendMessageMutationVariables>;
 export const UpdateUserProfileDocument = gql`
-    mutation UpdateUserProfile($userId: Int!, $input: ProfileUpdateInput!) {
-  updateProfile(userId: $userId, input: $input)
+    mutation UpdateUserProfile($userId: Int!, $bio: String!, $website: String!, $location: String!) {
+  updateProfile(
+    userId: $userId
+    bio: $bio
+    website: $website
+    location: $location
+  )
 }
     `;
 export type UpdateUserProfileMutationFn = Apollo.MutationFunction<UpdateUserProfileMutation, UpdateUserProfileMutationVariables>;
@@ -1963,7 +2082,9 @@ export type UpdateUserProfileMutationFn = Apollo.MutationFunction<UpdateUserProf
  * const [updateUserProfileMutation, { data, loading, error }] = useUpdateUserProfileMutation({
  *   variables: {
  *      userId: // value for 'userId'
- *      input: // value for 'input'
+ *      bio: // value for 'bio'
+ *      website: // value for 'website'
+ *      location: // value for 'location'
  *   },
  * });
  */

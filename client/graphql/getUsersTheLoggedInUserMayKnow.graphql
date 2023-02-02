@@ -1,0 +1,11 @@
+query getUsersTheLoggedInUserMayKnow($userId: Int) {
+  getUsersTheLoggedInUserMayKnow(userId: $userId) {
+    id
+    firstName
+    lastName
+    username
+    profile {
+      avatar
+    }
+  }
+}

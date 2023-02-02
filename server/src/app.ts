@@ -43,8 +43,8 @@ const main = async () => {
     socketPath: `${process.env.SOCKET_PATH}`,
     username: `${process.env.USERNAME}`,
     password: `${process.env.PASSWORD}`,
-    logging: true,
-    synchronize: false,
+    // logging: true,
+    // synchronize: false,
     entities: [Users, Post, Profile, LikedPost, Comment, Message, Following, RetweetPost],
   });
 

@@ -57,31 +57,30 @@ const Login: NextPage = () => {
         },
         { data }: any
       ) => {
-        if (!data) {
+        if (!data.loginUser.data) {
+          // setLoginError(res.data.loginUser.errors[0].message);
           return null;
         }
-        const currentUser = store.readQuery({
+        store.readQuery({
           query: GetCurrentUserDocument,
         });
 
         store.writeQuery({
           query: GetCurrentUserDocument,
           data: {
-            getCurrentUser: data?.loginUser?.user as any,
+            getCurrentUser: data?.loginUser?.data.user as any,
           },
         });
       },
     });
 
-    if (res && res.data) {
-      setAccessKey(res.data.loginUser.accessToken);
+    if (res && res.data?.loginUser.data) {
+      setAccessKey(res.data.loginUser.data?.accessToken);
       router.push("/");
     }
 
-    if (!res.data) {
-      if (res.errors) {
-        setLoginError(res.errors[0].message);
-      }
+    if (res && res.data?.loginUser.errors) {
+      setLoginError(res.data.loginUser.errors[0].message);
     }
   };
 

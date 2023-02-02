@@ -11,6 +11,7 @@ import { Box, Button, Divider } from "@material-ui/core";
 import {
   useGetAllUsersQuery,
   useGetCurrentUserQuery,
+  useGetUsersTheLoggedInUserMayKnowQuery,
 } from "../../graphql/generated/graphql";
 import Link from "next/link";
 
@@ -25,9 +26,12 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const YouMayKnow: React.FC = () => {
   const classes = useStyles();
-  const { data } = useGetAllUsersQuery({ fetchPolicy: "network-only" });
   const { data: currentUser } = useGetCurrentUserQuery({
     fetchPolicy: "cache-first",
+  });
+  const { data } = useGetUsersTheLoggedInUserMayKnowQuery({
+    fetchPolicy: "network-only",
+    variables: { userId: currentUser?.getCurrentUser?.id as number },
   });
 
   if (!data) {
@@ -43,7 +47,7 @@ export const YouMayKnow: React.FC = () => {
       </Box>
       <Divider />
       <List dense className={classes.root}>
-        {data.getAllUsers.map((user) => (
+        {data.getUsersTheLoggedInUserMayKnow.map((user) => (
           <div key={user.id}>
             <Link href={`/user/${user.id}`}>
               <ListItem key={user.id} button>
