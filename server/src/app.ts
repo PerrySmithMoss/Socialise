@@ -33,6 +33,8 @@ const main = async () => {
   );
   app.use(cookieParser());
   app.use(express.static("public"));
+  // Might need next line in prod
+  // app.set("trust proxy", 1) 
   app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
 
   await createConnection({

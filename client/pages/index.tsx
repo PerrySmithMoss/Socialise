@@ -16,6 +16,7 @@ import { setAccessKey } from "../auth/accessKey";
 import { LeftNav } from "../components/Home/LeftNav";
 import { YouMayKnow } from "../components/Home/YouMayKnow";
 import { ListOfPosts } from "../components/ListOfPosts";
+import Navbar from "../components/Navbar";
 import { SearchBar } from "../components/SearchBar";
 import { WhatsHappening } from "../components/WhatsHappening";
 
@@ -35,46 +36,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const Home: NextPage = () => {
-  const [loading, setLoading] = useState(true);
   const [spacing, setSpacing] = useState<GridSpacing>(0);
   const classes = useStyles();
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/refresh_token`, {
-      method: "POST",
-      credentials: "include",
-    }).then(async (x) => {
-      const { accessToken } = await x.json();
-      // console.log(accessToken);
-      setAccessKey(accessToken);
-      setLoading(false);
-    });
-  }, []);
-
-  if (loading) {
-    return (
-      <>
-        <Head>
-          <title>Socialise</title>
-          <meta name="description" content="Socialise" />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-        <div style={{ width: "100%" }}>
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            minHeight="100vh"
-            m={1}
-            p={1}
-          >
-            <Box p={1}>
-              <CircularProgress size={125} />
-            </Box>
-          </Box>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>
@@ -83,6 +46,7 @@ const Home: NextPage = () => {
         <meta name="description" content="Socialise" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Navbar />
       <Grid container className={classes.root}>
         <Grid item xs={12}>
           <Grid container justifyContent="center" spacing={spacing}>

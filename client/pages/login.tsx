@@ -15,6 +15,7 @@ import { useState } from "react";
 import { setAccessKey } from "../auth/accessKey";
 import {
   GetCurrentUserDocument,
+  GetCurrentUserQuery,
   useLoginMutation,
 } from "../graphql/generated/graphql";
 
@@ -45,35 +46,23 @@ const Login: NextPage = () => {
 
   const handleLoginUser = async () => {
     const res = await loginUser({
-      variables: { email, password },
-      // refetchQueries: [{ query: GetCurrentUserDocument }]
-      update: (
-        store: {
-          readQuery: (arg0: { query: DocumentNode }) => any;
-          writeQuery: (arg0: {
-            query: DocumentNode;
-            data: { getCurrentUser: any };
-          }) => void;
-        },
-        { data }: any
-      ) => {
-        if (!data.loginUser.data) {
-          // setLoginError(res.data.loginUser.errors[0].message);
+      variables: {
+        email,
+        password
+      },
+      update: (store, { data }) => {
+        if (!data) {
           return null;
         }
-        store.readQuery({
-          query: GetCurrentUserDocument,
-        });
 
         store.writeQuery({
           query: GetCurrentUserDocument,
           data: {
-            getCurrentUser: data?.loginUser?.data.user as any,
-          },
+            getCurrentUser: data.loginUser.data?.user
+          }
         });
-      },
+      }
     });
-
     if (res && res.data?.loginUser.data) {
       setAccessKey(res.data.loginUser.data?.accessToken);
       router.push("/");

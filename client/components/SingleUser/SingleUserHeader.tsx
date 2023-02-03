@@ -103,8 +103,6 @@ export const SingleUserHeader: React.FC<Props> = ({ userId }) => {
     setValue(newValue);
   };
 
-  console.log(data);
-
   if (!data) {
     return <div>Loading...</div>;
   }
