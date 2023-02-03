@@ -121,7 +121,7 @@ const client = new ApolloClient({
   //   // httpLink,
   //   uploadLink
   // ]),
-  link: splitLink as WebSocketLink,
+  link: splitLink as any,
   cache: new InMemoryCache(),
 });
 

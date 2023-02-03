@@ -241,7 +241,7 @@ export class UserResolver {
         errors: [
           {
             field: "email/password",
-            message: "Could not find a user with that email or password.",
+            message: "Could not find a user with that email/password.",
           },
         ],
       };
@@ -254,7 +254,7 @@ export class UserResolver {
         errors: [
           {
             field: "email/password",
-            message: "Could not find a user with that email or password.",
+            message: "Could not find a user with that email/password.",
           },
         ],
       };
