@@ -34,7 +34,7 @@ const main = async () => {
   app.use(cookieParser());
   app.use(express.static("public"));
   // Might need next line in prod
-  // app.set("trust proxy", 1) 
+  // app.set("trust proxy", 1)
   app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
 
   await createConnection({
@@ -42,7 +42,16 @@ const main = async () => {
     url: process.env.DB_URL,
     // logging: true,
     // synchronize: false,
-    entities: [Users, Post, Profile, LikedPost, Comment, Message, Following, RetweetPost],
+    entities: [
+      Users,
+      Post,
+      Profile,
+      LikedPost,
+      Comment,
+      Message,
+      Following,
+      RetweetPost,
+    ],
   });
 
   app.post("/refresh_token", async (req: Request, res: Response) => {
@@ -84,7 +93,8 @@ const main = async () => {
     subscriptions: {
       path: "/subscriptions",
       onConnect: () => console.log("✅  Client connected for subscriptions"),
-      onDisconnect: () => console.log("❌  Client disconnected from subscriptions")
+      onDisconnect: () =>
+        console.log("❌  Client disconnected from subscriptions"),
     },
     uploads: false,
   });
@@ -98,13 +108,12 @@ const main = async () => {
     res.send("Hello");
   });
 
-  const PORT = process.env.APP_PORT || 5000;
-  httpServer.listen(PORT, () => { 
-    console.log(`🚀 Server running on ${process.env.SERVER_URL}`)
+  httpServer.listen(() => {
+    console.log(`🚀 Server running on ${process.env.SERVER_URL}`);
     console.log(
-      `🚀  Subscriptions ready at ws://${process.env.SERVER_DOMAIN}:${PORT}${apolloServer.subscriptionsPath}`,
+      `🚀  Subscriptions ready at ws://${process.env.SERVER_DOMAIN}:${apolloServer.subscriptionsPath}`
     );
-    });
+  });
 };
 
 main().catch((err) => {
