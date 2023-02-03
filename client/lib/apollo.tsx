@@ -71,7 +71,7 @@ export function withApollo(PageComponent: any, { ssr = true } = {}) {
           const cookies = cookie.parse(req.headers.cookie);
           if (cookies.habit) {
             const response = await fetch(
-              "http://localhost:5000/refresh_token",
+              `${process.env.NEXT_PUBLIC_SERVER_URL}/refresh_token`,
               {
                 method: "POST",
                 credentials: "include",
@@ -200,7 +200,7 @@ function createApolloClient(initialState = {}, serverAccessToken?: string) {
       }
     },
     fetchAccessToken: () => {
-      return fetch("http://localhost:5000/refresh_token", {
+      return fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/refresh_token`, {
         method: "POST",
         credentials: "include",
       });
@@ -232,7 +232,7 @@ function createApolloClient(initialState = {}, serverAccessToken?: string) {
   const wsLink =
     typeof window !== "undefined"
       ? new WebSocketLink({
-          uri: "ws://localhost:5000/subscriptions",
+          uri: `ws://${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/subscriptions`,
           options: {
             reconnect: true,
             connectionParams: {
@@ -248,13 +248,13 @@ function createApolloClient(initialState = {}, serverAccessToken?: string) {
       : null;
 
   const httpLink = new HttpLink({
-    uri: "http://localhost:5000/graphql",
+    uri: `${process.env.NEXT_PUBLIC_SERVER_URL}/graphql`,
     credentials: "include",
     fetch
   });
 
   let uploadLink = createUploadLink({
-    uri: "http://localhost:5000/graphql",
+    uri: `${process.env.NEXT_PUBLIC_SERVER_URL}/graphql`,
     credentials: "include",
   });
 

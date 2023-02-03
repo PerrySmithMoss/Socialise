@@ -1,7 +1,6 @@
 {
   "name": "client",
   "version": "0.1.0",
-  "private": true,
   "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev",
@@ -10,7 +9,7 @@
     "test": "jest",
     "lint": "next lint",
     "prettier": "prettier --write .",
-    "gen": "graphql-codegen --config codegen.yml"
+    "gen": "graphql-codegen --config codegen.js"
   },
   "dependencies": {
     "@apollo/client": "^3.3.15",

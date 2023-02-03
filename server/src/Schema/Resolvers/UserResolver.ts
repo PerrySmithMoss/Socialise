@@ -187,7 +187,7 @@ export class UserResolver {
         __dirname,
         `../../../public/images/${randomString}`
       );
-      const pathNameForClient = `http://localhost:5000/images/${randomString}`;
+      const pathNameForClient = `${process.env.SERVER_URL}/images/${randomString}`;
       stream.pipe(fs.createWriteStream(pathNameForServer));
 
       const user = await Users.findOneOrFail(userId, {
@@ -197,7 +197,7 @@ export class UserResolver {
       await Profile.update(user.profileId, { avatar: pathNameForClient });
 
       return {
-        url: `http://localhost:5000/images/${filename}`,
+        url: `${process.env.SERVER_URL}/images/${filename}`,
       };
     } catch (err) {
       return {

@@ -27,7 +27,7 @@ const main = async () => {
   const app: Application = express();
   app.use(
     cors({
-      origin: "http://localhost:3000",
+      origin: process.env.SERVER_URL,
       credentials: true,
     })
   );
@@ -105,9 +105,9 @@ const main = async () => {
 
   const PORT = process.env.APP_PORT || 5000;
   httpServer.listen(PORT, () => { 
-    console.log(`🚀  Server running on http://localhost:${PORT}`)
+    console.log(`🚀 Server running on ${process.env.SERVER_URL}`)
     console.log(
-      `🚀  Subscriptions ready at ws://localhost:${PORT}${apolloServer.subscriptionsPath}`,
+      `🚀  Subscriptions ready at ws://${process.env.SERVER_DOMAIN}:${PORT}${apolloServer.subscriptionsPath}`,
     );
     });
 };
