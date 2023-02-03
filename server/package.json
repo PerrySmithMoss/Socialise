@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/app.ts",
     "start": "node dist/app.js",
-    "build": "tsc -p ."
+    "build": "yarn && tsc -p ."
   },
   "keywords": [],
   "author": "",
@@ -25,6 +25,7 @@
     "graphql-upload": "^11.0.0",
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
+    "pg": "^8.9.0",
     "type-graphql": "^1.1.1",
     "typeorm": "^0.2.32"
   },

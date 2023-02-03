@@ -38,13 +38,8 @@ const main = async () => {
   app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
 
   await createConnection({
-    type: "mysql",
-    host: `${process.env.HOST}`,
-    port: parseInt(`${process.env.DATABASE_PORT}`),
-    database: `${process.env.DATABASE}`,
-    socketPath: `${process.env.SOCKET_PATH}`,
-    username: `${process.env.USERNAME}`,
-    password: `${process.env.PASSWORD}`,
+    type: "postgres",
+    url: process.env.DB_URL,
     // logging: true,
     // synchronize: false,
     entities: [Users, Post, Profile, LikedPost, Comment, Message, Following, RetweetPost],
