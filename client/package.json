@@ -4,7 +4,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "yarn gen && next build",
     "start": "next start",
     "test": "jest",
     "lint": "next lint",
