@@ -39,12 +39,13 @@ const main = async () => {
 
   await createConnection({
     type: "postgres",
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT as unknown as number,
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    schema: process.env.DB_SCHEMA,
-    database: process.env.DB_DATABASE,
+    url: process.env.DB_URL,
+    // host: process.env.DB_HOST,
+    // port: process.env.DB_PORT as unknown as number,
+    // username: process.env.DB_USERNAME,
+    // password: process.env.DB_PASSWORD,
+    // schema: process.env.DB_SCHEMA,
+    // database: process.env.DB_DATABASE,
     entities: [
       Users,
       Post,
