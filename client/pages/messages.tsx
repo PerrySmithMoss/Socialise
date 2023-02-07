@@ -5,6 +5,7 @@ import { LeftNav } from "../components/Home/LeftNav";
 import { MessagesList } from "../components/Messages/MessagesList";
 import Head from "next/head";
 import { NextPage } from "next";
+import Navbar from "../components/Navbar";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,7 +35,8 @@ const Messages: NextPage = () => {
         <meta name="description" content="Socialise" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Grid container className={classes.root} spacing={2}>
+      <Navbar />
+      <Grid container className={classes.root}>
         <Grid item xs={12}>
           <Grid container justifyContent="center" spacing={spacing}>
             <Grid item className={classes.grid}>

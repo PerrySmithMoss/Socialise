@@ -9,6 +9,7 @@ import { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { setAccessKey } from "../auth/accessKey";
+import Navbar from "../components/Navbar";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -70,6 +71,7 @@ const Register: NextPage = () => {
         <meta name="description" content="Socialise" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Navbar />
       <div style={{ width: "100%" }}>
         <Box
           display="flex"

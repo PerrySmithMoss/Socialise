@@ -2,20 +2,16 @@ import { verify } from "jsonwebtoken";
 import {
   Arg,
   Ctx,
-  Field,
   Int,
   Mutation,
-  ObjectType,
   Query,
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import { createQueryBuilder, getConnection } from "typeorm";
+import { getConnection } from "typeorm";
 import { isAuth } from "../../auth/middleware/isAuth";
-import { sendRefreshKey } from "../../auth/sendRefreshKey";
 import { LikedPost } from "../../Entities/LikedPost";
 import { Post } from "../../Entities/Post";
-import { Users } from "../../Entities/Users";
 import { MyContext } from "../../Types/MyContext";
 import { Comment } from "../../Entities/Comment";
 import { RetweetPost } from "../../Entities/RetweetPost";
@@ -45,7 +41,6 @@ export class PostResolver {
   @Query(() => [Post])
   async getAllUserPosts(@Ctx() context: MyContext) {
     const authorization = context.req.headers["authorization"];
-    console.log(authorization);
 
     if (!authorization) {
       console.log("You're not authorized");
@@ -56,16 +51,7 @@ export class PostResolver {
       const token = authorization!.split(" ")[1];
       const payload: any = verify(token, process.env.ACCESS_KEY!);
       const userId = payload.userId;
-      console.log("Your user id is:" + payload.userId);
 
-      // const qb = getConnection()
-      //   .getRepository(Post)
-      //   .createQueryBuilder("p")
-      //   .innerJoinAndSelect("p.user", "u", "u.id = p.userID")
-      //   .where("p.userID = :id", { id: payload.userId })
-      //   .orderBy("p.datePublished", "DESC");
-
-      // const posts = await qb.getMany();
       const userPosts = await Post.find({
         relations: [
           "likes",
@@ -83,7 +69,6 @@ export class PostResolver {
           datePublished: "DESC",
         },
       });
-      console.log(userPosts);
 
       return userPosts;
     } catch (e) {
@@ -156,19 +141,15 @@ export class PostResolver {
     @Arg("firstName") firstName: string,
     @Arg("lastName") lastName: string,
     @Arg("userName") userName: string,
-    @Arg("datePublished") datePublished: Date
+    @Arg("datePublished") datePublished: string
   ) {
     const authorization = context.req.headers["authorization"];
-    console.log(authorization);
 
     try {
       const token = authorization!.split(" ")[1];
       const payload: any = verify(token, process.env.ACCESS_KEY!);
       const userId = payload.userId;
-      console.log("Your user id is:" + payload.userId);
-      // const firstName = payload?.
-      // const lastName = payload?.userId
-      // const userName = payload?.userId
+
       await Post.insert({
         userId: userId,
         content,
@@ -199,18 +180,15 @@ export class PostResolver {
     @Ctx() context: MyContext
   ) {
     const authorization = context.req.headers["authorization"];
-    // console.log(authorization);
 
     try {
       const token = authorization!.split(" ")[1];
       const payload: any = verify(token, process.env.ACCESS_KEY!);
       const userId = payload.userId;
-      console.log("Your user id is:" + payload.userId);
 
       const isLiked = value !== -1;
-      console.log("isLiked: ", isLiked);
+
       const realValue = isLiked ? 1 : -1;
-      console.log("realValue: ", realValue);
 
       const likedPost = await LikedPost.findOne({
         where: { postId, userId },
@@ -218,37 +196,35 @@ export class PostResolver {
 
       // the user has liked the post before
       if (likedPost) {
-        console.log("User has already liked the post before");
         await getConnection().transaction(async (trns) => {
           await trns.query(
             `
             DELETE FROM liked_posts
-            WHERE postId = ${postId} AND userId = ${userId}
+            WHERE "postId" = ${postId} AND "userId" = ${userId}
             `
           );
           await trns.query(
             `
             UPDATE posts
-            SET points = points - 1
-            WHERE id = ${postId}
+            SET "points" = "points" - 1
+            WHERE "id" = ${postId}
             `
           );
         });
       } else if (!likedPost) {
         // user has not liked post
         await getConnection().transaction(async (trns) => {
-          console.log("User has not liked the post before");
           await trns.query(
             `
-            INSERT INTO liked_posts (userId, postId, value)
+            INSERT INTO liked_posts ("userId", "postId", "value")
             VALUES (${userId}, ${postId}, ${realValue});
             `
           );
           await trns.query(
             `
             UPDATE posts 
-            SET points = points + ${realValue}
-            WHERE id = ${postId};
+            SET "points" = "points" + ${realValue}
+            WHERE "id" = ${postId};
             `
           );
         });
@@ -268,18 +244,14 @@ export class PostResolver {
     @Ctx() context: MyContext
   ) {
     const authorization = context.req.headers["authorization"];
-    console.log(authorization);
 
     try {
       const token = authorization!.split(" ")[1];
       const payload: any = verify(token, process.env.ACCESS_KEY!);
       const userId = payload.userId;
-      console.log("Your user id is:" + payload.userId);
 
       const isLiked = value !== -1;
-      console.log("isLiked: ", isLiked);
       const realValue = isLiked ? 1 : -1;
-      console.log("realValue: ", realValue);
 
       const likedPost = await RetweetPost.findOne({
         where: { postId, userId },
@@ -287,37 +259,35 @@ export class PostResolver {
 
       // the user has retweeted the post before
       if (likedPost) {
-        console.log("User has already retweeted the post before");
         await getConnection().transaction(async (trns) => {
           await trns.query(
             `
             DELETE FROM retweets
-            WHERE postId = ${postId} AND userId = ${userId}
+            WHERE "postId" = ${postId} AND "userId" = ${userId}
             `
           );
           await trns.query(
             `
             UPDATE posts
-            SET retweetsCount = retweetsCount - 1
-            WHERE id = ${postId}
+            SET "retweetsCount" = "retweetsCount" - 1
+            WHERE "id" = ${postId}
             `
           );
         });
       } else if (!likedPost) {
         // user has not retweeted post
         await getConnection().transaction(async (trns) => {
-          console.log("User has not retweeted the post before");
           await trns.query(
             `
-            INSERT INTO retweets (userId, postId, value)
+            INSERT INTO retweets ("userId", "postId", "value")
             VALUES (${userId}, ${postId}, ${realValue});
             `
           );
           await trns.query(
             `
             UPDATE posts 
-            SET retweetsCount = retweetsCount + ${realValue}
-            WHERE id = ${postId};
+            SET "retweetsCount" = "retweetsCount" + ${realValue}
+            WHERE "id" = ${postId};
             `
           );
         });
@@ -334,38 +304,15 @@ export class PostResolver {
   async commentOnPost(
     @Arg("postId", () => Int) postId: number,
     @Arg("comment", () => String) comment: string,
-    @Arg("datePublished") datePublished: Date,
+    @Arg("datePublished") datePublished: string,
     @Ctx() context: MyContext
   ) {
     const authorization = context.req.headers["authorization"];
-    console.log(authorization);
 
     try {
       const token = authorization!.split(" ")[1];
       const payload: any = verify(token, process.env.ACCESS_KEY!);
       const userId = payload.userId;
-      console.log("Your user id is:" + payload.userId);
-
-      //   await getConnection().transaction(async (trns) => {
-      //       await trns.query(
-      //         `
-      //         INSERT INTO comments (userId, postId, comment)
-      //         VALUES (${userId}, ${postId}, ${comment});
-      //         `
-      //       );
-      //       await trns.query(
-      //         `
-      //         UPDATE posts
-      //         SET commentsCount = commentsCount + 1
-      //         WHERE id = ${postId};
-      //         `
-      //       );
-      // });
-
-      // const post = await Post.findOne({
-      //   where: { postId },
-      // });
-      // await Post.update({id: postId}, commen)
 
       await Comment.insert({
         userId: userId,
@@ -377,8 +324,8 @@ export class PostResolver {
       await getConnection().query(
         `
           UPDATE posts 
-          SET commentsCount = commentsCount + 1
-          WHERE id = ${postId};
+          SET "commentsCount" = "commentsCount" + 1
+          WHERE "id" = ${postId};
           `
       );
     } catch (err) {

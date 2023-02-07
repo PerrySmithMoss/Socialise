@@ -21,6 +21,7 @@ import ImageOutlinedIcon from "@material-ui/icons/ImageOutlined";
 import VideoLibraryOutlinedIcon from "@material-ui/icons/VideoLibraryOutlined";
 import SendIcon from "@material-ui/icons/Send";
 import moment from "moment";
+import { useRouter } from "next/router";
 
 interface Props {}
 
@@ -132,7 +133,7 @@ export const Message: React.FC<MessageProps> = ({
     fetchPolicy: "network-only",
     variables: { userId: selectedUserId },
   });
-
+  const router = useRouter();
   const [sendMessage] = useSendMessageMutation();
   // const { data: newMessage, error: messageError } =
   //   useNewMessageSubscription();
@@ -167,13 +168,6 @@ export const Message: React.FC<MessageProps> = ({
     query: GET_CURRENT_USER,
   });
 
-  if (currentUser.getCurrentUser === null) {
-    console.log("You're not logged in...");
-  } else {
-    console.log(currentUser);
-  }
-
-  // console.log(specifiedUserInfo);
   const [dateSent, setdateSent] = useState(
     moment().format("YYYY-MM-DD hh:mm:ss").toString()
   );
@@ -249,7 +243,15 @@ export const Message: React.FC<MessageProps> = ({
           </Box>
 
           <Box mt={1}>
-            <IconButton style={{ color: "#14ffec" }} aria-label="delete">
+            <IconButton
+              onClick={() =>
+                router.push(
+                  `/user/${specifiedUserInfo?.getSpecificUserInfo.id}`
+                )
+              }
+              style={{ color: "#14ffec" }}
+              aria-label="delete"
+            >
               <InfoOutlinedIcon />
             </IconButton>
           </Box>
@@ -357,19 +359,13 @@ export const Message: React.FC<MessageProps> = ({
             ))}
             <Box pt={10}>
               <Divider />
-              <Box display="flex" pt={2} pb={1} bgcolor="background.paper">
-                <Box>
-                  <IconButton style={{ color: "#14ffec" }} aria-label="delete">
-                    <ImageOutlinedIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-
-                <Box>
-                  <IconButton style={{ color: "#14ffec" }} aria-label="delete">
-                    <VideoLibraryOutlinedIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-
+              <Box
+                display="flex"
+                justifyContent="center"
+                pt={2}
+                pb={1}
+                bgcolor="background.paper"
+              >
                 <Box>
                   <div className={classes.newMessage}>
                     <TextField

@@ -61,18 +61,6 @@ export const YouMayKnow: React.FC = () => {
                   id={user?.id.toString()}
                   primary={`${user.firstName} ${user.lastName}`}
                 />
-                {currentUser?.getCurrentUser ? (
-                  <ListItemSecondaryAction>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      color="primary"
-                      style={{ color: "#14ffec", border: "1px solid #14ffec" }}
-                    >
-                      Follow
-                    </Button>
-                  </ListItemSecondaryAction>
-                ) : null}
               </ListItem>
             </Link>
             <Box pt={1} pb={1}>

@@ -1,26 +1,17 @@
-query GetAllUserMessages{
+query GetAllUserMessages {
   getAllUserMessages {
     id
     content
+    dateSent
     fromId
-    from{
-      id
-      firstName
-      lastName
-      username
-      profile {
-        avatar
-      }
-    }
     toId
-    to {
-      id
-      firstName
-      lastName
-      username
-      profile {
-        avatar
-      }
-    }
+    sender_firstName
+    sender_lastName
+    sender_username
+    receiver_firstName
+    receiver_lastName
+    receiver_username
+    sender_avatar
+    receiver_avatar
   }
 }

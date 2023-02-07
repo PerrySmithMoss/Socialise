@@ -16,9 +16,9 @@ export class Comment extends BaseEntity {
   @Column()
   comment: string;
 
-  @Field(() => Date)
+  @Field(() => String)
   @Column()
-  datePublished!: Date;
+  datePublished!: string;
 
   @Field(() => Int)
   @PrimaryColumn()

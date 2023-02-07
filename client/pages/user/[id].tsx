@@ -15,6 +15,7 @@ import {
 } from "../../graphql/generated/graphql";
 import { useRouter } from "next/router";
 import { YouMayKnow } from "../../components/Home/YouMayKnow";
+import Navbar from "../../components/Navbar";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -66,6 +67,7 @@ const IndividualUser: NextPage = () => {
           <meta name="description" content="Socialise" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
+        <Navbar />
         <Grid container className={classes.root}>
           <Grid item xs={12}>
             <Grid container justifyContent="center">

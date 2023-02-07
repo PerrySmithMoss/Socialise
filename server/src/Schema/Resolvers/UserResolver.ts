@@ -291,7 +291,6 @@ export class UserResolver {
         ],
       };
     }
-    console.log("res: ", res);
 
     if (password.length < 8) {
       return {
@@ -435,7 +434,6 @@ export class UserResolver {
       const isFollowing = value !== -1;
 
       const realValue = isFollowing ? 1 : -1;
-      console.log("realValue: ", realValue);
 
       const followedUser = await Following.findOne({
         where: { followingId: followingId, followerId: userId },
@@ -443,55 +441,53 @@ export class UserResolver {
 
       // Unfollowing a user
       if (followedUser) {
-        console.log("User has already followed the user before");
         await getConnection().transaction(async (trns) => {
           await trns.query(
             `
             DELETE FROM following
-            WHERE followingId = ${followingId} AND followerId = ${userId}
+            WHERE "followingId" = ${followingId} AND "followerId" = ${userId}
             `
           );
           // Decrement the user's followersCount of the user to be un-followed
           await trns.query(
             `
             UPDATE users
-            SET followersCount = followersCount - 1
-            WHERE id = ${followingId}
+            SET "followersCount" = "followersCount" - 1
+            WHERE "id" = ${followingId}
             `
           );
           // Decrement the user's followingCount of the user who is un-following
           await trns.query(
             `
             UPDATE users
-            SET followingCount = followersCount - 1
-            WHERE id = ${userId}
+            SET "followingCount" = "followersCount" - 1
+            WHERE "id" = ${userId}
             `
           );
         });
       } else if (!followedUser) {
         // Following a user
         await getConnection().transaction(async (trns) => {
-          console.log("User has not followed the user before");
           await trns.query(
             `
-            INSERT INTO following (username, followingId, followerId, value)
-            VALUES ("${username}", ${followingId}, ${userId}, ${realValue});
+            INSERT INTO following ("username", "followingId", "followerId", "value")
+            VALUES ('${username}', ${followingId}, ${userId}, ${realValue});
             `
           );
           // Increment the user's followersCount of the user to be followed
           await trns.query(
             `
             UPDATE users 
-            SET followersCount = followersCount + ${realValue}
-            WHERE id = ${followingId};
+            SET "followersCount" = "followersCount" + ${realValue}
+            WHERE "id" = ${followingId};
             `
           );
           // Increment the user's followingCount of the user who is following
           await trns.query(
             `
             UPDATE users 
-            SET followingCount = followingCount + ${realValue}
-            WHERE id = ${userId};
+            SET "followingCount" = "followingCount" + ${realValue}
+            WHERE "id" = ${userId};
             `
           );
         });

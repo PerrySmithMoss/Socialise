@@ -182,7 +182,7 @@ export const ListOfPosts: React.FC = () => {
 
               <LikeButton currentUser={currentUser} post={post} />
 
-              {currentUser?.getCurrentUser ? (
+              {currentUser?.getCurrentUser?.id === post.userId ? (
                 <Box flexGrow={1}>
                   <IconButton
                     aria-label="settings"
@@ -204,14 +204,6 @@ export const ListOfPosts: React.FC = () => {
                       onClick={handleDeletePost}
                     >
                       Delete post <DeleteIcon />
-                    </MenuItem>
-                    <Divider></Divider>
-                    <MenuItem onClick={handleClose}>
-                      Pin to your timeline <PersonPinCircleIcon />
-                    </MenuItem>
-                    <Divider></Divider>
-                    <MenuItem onClick={handleClose}>
-                      Add/remove from your list <ListIcon />
                     </MenuItem>
                   </Menu>
                 </Box>

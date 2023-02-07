@@ -79,13 +79,8 @@ export const WhatsHappening: React.FC = () => {
     {User?.getCurrentUser ? (
     <div className={classes.root}>
       <Box display="flex" alignItems="center" pl={2} bgcolor="background.paper">
-        <Box flexGrow={1}>
+        <Box flexGrow={1} mt={2} mb={1}>
           <h2 className="text-xl">Home</h2>
-        </Box>
-        <Box mt={1}>
-          <IconButton style={{ color: "#14ffec" }} aria-label="delete">
-            <TimelineIcon fontSize="small" />
-          </IconButton>
         </Box>
       </Box>
       <Divider />
@@ -123,15 +118,7 @@ export const WhatsHappening: React.FC = () => {
         </Box>
       </Box>
 
-      <Box display="flex" pl={1} pr={1} pb={1} bgcolor="background.paper">
-        <Box p={1} flexGrow={1}>
-          <div className={classes.icon}>
-            <ImageSearchIcon style={{ color: "#14ffec" }} />
-            <ImageIcon style={{ color: "#14ffec" }} />
-            <SentimentSatisfiedIcon style={{ color: "#14ffec" }} />
-            <SubjectIcon style={{ color: "#14ffec" }} />
-          </div>
-        </Box>
+      <Box display="flex" justifyContent="right" pl={1} pr={1} pb={1} bgcolor="background.paper">
         <Box p={1}>
           <Button
             onClick={() => handleCreatePost()}

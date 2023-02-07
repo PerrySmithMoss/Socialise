@@ -36,6 +36,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { NextPage } from "next";
 import { YouMayKnow } from "../../components/Home/YouMayKnow";
+import Navbar from "../../components/Navbar";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -96,8 +97,6 @@ const IndividualPost: NextPage = () => {
     }
   }, [router.query.id]);
 
-  console.log(post);
-
   if (loading && loadingPost) {
     return <div>Loading...</div>;
   } else if (post) {
@@ -108,6 +107,7 @@ const IndividualPost: NextPage = () => {
           <meta name="description" content="Socialise" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
+        <Navbar />
         <Grid container className={classes.root}>
           <Grid item xs={12}>
             <Grid container justifyContent="center">
@@ -199,7 +199,7 @@ const IndividualPost: NextPage = () => {
                       currentUser={currentUser?.getCurrentUser}
                       post={post?.getPostById}
                     />
-                    {currentUser?.getCurrentUser ? (
+                    {currentUser?.getCurrentUser?.id === post.getPostById.userId ? (
                       <Box flexGrow={1}>
                         <IconButton
                           aria-label="settings"
@@ -226,14 +226,6 @@ const IndividualPost: NextPage = () => {
                             // }}
                           >
                             Delete post <DeleteIcon />
-                          </MenuItem>
-                          <Divider></Divider>
-                          <MenuItem onClick={handleClose}>
-                            Pin to your timeline <PersonPinCircleIcon />
-                          </MenuItem>
-                          <Divider></Divider>
-                          <MenuItem onClick={handleClose}>
-                            Add/remove from your list <ListIcon />
                           </MenuItem>
                         </Menu>
                       </Box>

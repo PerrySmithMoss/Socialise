@@ -1,4 +1,4 @@
-mutation SendMessage($toId: Int!, $dateSent: DateTime!, $content: String!) {
+mutation SendMessage($toId: Int!, $dateSent: String!, $content: String!) {
   sendMessage(toId: $toId, dateSent: $dateSent, content: $content) {
     id
     fromId

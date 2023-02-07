@@ -66,7 +66,6 @@ export function withApollo(PageComponent: any, { ssr = true } = {}) {
       let serverAccessToken = "";
 
       if (isServer()) {
-        console.log("req.headers.cookie: ", req.headers.cookie);
         if (req.headers.cookie) {
           const cookies = cookie.parse(req.headers.cookie);
           if (cookies.habit) {

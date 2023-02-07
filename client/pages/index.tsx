@@ -1,6 +1,4 @@
 import {
-  Box,
-  CircularProgress,
   createStyles,
   Grid,
   GridSpacing,
@@ -11,8 +9,7 @@ import {
 import type { NextPage } from "next";
 import Head from "next/head";
 import React from "react";
-import { useState, useEffect } from "react";
-import { setAccessKey } from "../auth/accessKey";
+import { useState } from "react";
 import { LeftNav } from "../components/Home/LeftNav";
 import { YouMayKnow } from "../components/Home/YouMayKnow";
 import { ListOfPosts } from "../components/ListOfPosts";

@@ -4,11 +4,8 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
-  OneToMany,
   OneToOne,
-  JoinColumn,
 } from "typeorm";
-import { Post } from "./Post";
 import { Users } from "./Users";
 
 @ObjectType()

@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { useState } from "react";
 import { setAccessKey } from "../auth/accessKey";
+import Navbar from "../components/Navbar";
 import {
   GetCurrentUserDocument,
   GetCurrentUserQuery,
@@ -80,6 +81,7 @@ const Login: NextPage = () => {
         <meta name="description" content="Socialise" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Navbar />
       <div style={{ width: "100%" }}>
         <Box
           display="flex"

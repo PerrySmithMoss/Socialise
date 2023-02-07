@@ -32,9 +32,9 @@ export class Post extends BaseEntity {
   @Column()
   content!: string;
 
-  @Field(() => Date)
+  @Field(() => String)
   @Column()
-  datePublished!: Date;
+  datePublished!: String;
 
   @Field()
   @Column({ type: "int", default: 0 })

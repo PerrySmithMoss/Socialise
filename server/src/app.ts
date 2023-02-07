@@ -23,29 +23,33 @@ import http from "http";
 import { Following } from "./Entities/Following";
 import { RetweetPost } from "./Entities/RetweetPost";
 
+const app: Application = express();
+const httpServer = http.createServer(app);
+
 const main = async () => {
-  const app: Application = express();
   app.use(
     cors({
-      origin: process.env.SERVER_URL,
+      origin: process.env.CLIENT_URL,
       credentials: true,
     })
   );
   app.use(cookieParser());
   app.use(express.static("public"));
+  app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
+
   // Might need next line in prod
   // app.set("trust proxy", 1)
-  app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
+  
 
   await createConnection({
     type: "postgres",
-    url: process.env.DB_URL,
-    // host: process.env.DB_HOST,
-    // port: process.env.DB_PORT as unknown as number,
-    // username: process.env.DB_USERNAME,
-    // password: process.env.DB_PASSWORD,
-    // schema: process.env.DB_SCHEMA,
-    // database: process.env.DB_DATABASE,
+    host: `${process.env.DB_HOST}`,
+    port: parseInt(`${process.env.DB_PORT}`),
+    username: `${process.env.DB_USERNAME}`,
+    password: `${process.env.DB_PASSWORD}`,
+    database: `${process.env.DB_DATABASE}`,
+    // synchronize: true,
+    // url: process.env.DB_URL,
     entities: [
       Users,
       Post,
@@ -56,6 +60,21 @@ const main = async () => {
       Following,
       RetweetPost,
     ],
+  });
+
+  app.get("/health-check", (req: Request, res: Response) => {
+    const healthcheck = {
+      uptime: process.uptime(),
+      response_time: process.hrtime(),
+      message: "OK",
+      timestamp: Date.now(),
+    };
+    try {
+      res.send(healthcheck);
+    } catch (error: any) {
+      healthcheck.message = error;
+      res.status(503).send(healthcheck);
+    }
   });
 
   app.post("/refresh_token", async (req: Request, res: Response) => {
@@ -103,16 +122,10 @@ const main = async () => {
     uploads: false,
   });
 
-  const httpServer = http.createServer(app);
-
   apolloServer.applyMiddleware({ app, cors: false });
   apolloServer.installSubscriptionHandlers(httpServer);
 
-  app.get("/", (req: Request, res: Response) => {
-    res.send("Hello");
-  });
-
-  httpServer.listen(() => {
+  httpServer.listen(5000, () => {
     console.log(`🚀 Server running on ${process.env.SERVER_URL}`);
     console.log(
       `🚀  Subscriptions ready at ws://${process.env.SERVER_DOMAIN}:${apolloServer.subscriptionsPath}`

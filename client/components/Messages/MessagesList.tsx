@@ -106,12 +106,11 @@ export const MessagesList: React.FC<Props> = () => {
   //   { loading, data, subscribeToMore}
   //  = useQuery(GET_MESSAGES);
 
-  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState<null | number>(null);
 
   const handleSelectedUserClick = (fromId: number) => {};
 
   useEffect(() => {
-    console.log(allMessages);
     if (selectedUserId) {
       getAllMessagesFromUser({
         variables: {
@@ -131,9 +130,6 @@ export const MessagesList: React.FC<Props> = () => {
       //     return prev
       //   },
       // });
-      if (messagesData) {
-        console.log(messagesData);
-      }
     }
   }, [selectedUserId]);
 
@@ -143,18 +139,9 @@ export const MessagesList: React.FC<Props> = () => {
     <>
       <Grid item className={classes.grid}>
         <div className={classes.test}>
-          <Box width={305} display="flex" pl={2} bgcolor="background.paper">
-            <Box flexGrow={1}>
-              <h2>Messages</h2>
-            </Box>
-
-            <Box mt={1}>
-              <IconButton style={{ color: "#14ffec" }} aria-label="delete">
-                <SettingsIcon fontSize="small" />
-              </IconButton>
-              <IconButton style={{ color: "#14ffec" }} aria-label="delete">
-                <AddCommentIcon fontSize="small" />
-              </IconButton>
+          <Box width={305} display="flex" alignItems="center" pl={2} bgcolor="background.paper">
+            <Box flexGrow={1} mt={2} mb={1}>
+              <h2 className="text-2xl">Messages</h2>
             </Box>
           </Box>
 
@@ -164,15 +151,15 @@ export const MessagesList: React.FC<Props> = () => {
           <Box display="flex" pt={1} bgcolor="background.paper"></Box>
           <Divider />
 
-          {allMessages?.getAllUserMessages.map((message: any) => (
+          {allMessages?.getAllUserMessages.map((message) => (
             <List className={classes.root}>
               <ListItem
                 //    key={post.id}
                 button
                 onClick={
-                  currentUser?.getCurrentUser?.id === message.to.id
-                    ? () => setSelectedUserId(message.from.id)
-                    : () => setSelectedUserId(message.to.id)
+                  currentUser?.getCurrentUser?.id === message.toId
+                    ? () => setSelectedUserId(message.fromId)
+                    : () => setSelectedUserId(message.toId)
                 }
                 // () => setSelectedUserId(message.to.id)}
                 // component={Link}
@@ -184,17 +171,17 @@ export const MessagesList: React.FC<Props> = () => {
                   <Avatar
                     alt="Remy Sharp"
                     src={
-                      currentUser?.getCurrentUser?.id === message.to.id
-                        ? `${message.from.profile.avatar as string}`
-                        : `${message.to.profile.avatar as string}`
+                      currentUser?.getCurrentUser?.id === message.toId
+                        ? `${message.sender_avatar as string}`
+                        : `${message.receiver_avatar as string}`
                     }
                   />
                 </ListItemAvatar>
                 <ListItemText
                   primary={
-                    currentUser?.getCurrentUser?.id === message.to.id
-                      ? `${message.from.firstName} ${message.from.lastName}`
-                      : `${message.to.firstName} ${message.to.lastName}`
+                    currentUser?.getCurrentUser?.id === message.toId
+                      ? `${message.sender_firstName} ${message.sender_lastName}`
+                      : `${message.receiver_firstName} ${message.receiver_lastName}`
                   }
                   secondary={
                     <React.Fragment>

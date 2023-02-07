@@ -111,12 +111,6 @@ export const RetweetPost: React.FC<Props> = ({ post, currentUser }) => {
             <span>Retweet</span>
           </MenuItem>
         )}
-
-        <Divider></Divider>
-        <MenuItem onClick={handleClose}>
-          <CreateIcon style={{ marginRight: "10px" }} /> Quote Tweet
-        </MenuItem>
-        <Divider></Divider>
       </Menu>
     </Box>
   );

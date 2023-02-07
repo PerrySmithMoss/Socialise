@@ -3,7 +3,7 @@ mutation CreatePost(
   $firstName: String!
   $lastName: String!
   $userName: String!
-  $datePublished: DateTime!
+  $datePublished: String!
 ) {
   createPost(
     content: $content

@@ -21,7 +21,7 @@ export type Scalars = {
 export type Comment = {
   __typename?: 'Comment';
   comment: Scalars['String'];
-  datePublished: Scalars['DateTime'];
+  datePublished: Scalars['String'];
   userId: Scalars['Int'];
   user: Users;
   postId: Scalars['Int'];
@@ -66,7 +66,7 @@ export type Message = {
   __typename?: 'Message';
   id: Scalars['Int'];
   content: Scalars['String'];
-  dateSent: Scalars['DateTime'];
+  dateSent: Scalars['String'];
   fromId: Scalars['Int'];
   from: Users;
   toId: Scalars['Int'];
@@ -148,13 +148,13 @@ export type MutationFollowUserArgs = {
 
 export type MutationSendMessageArgs = {
   content: Scalars['String'];
-  dateSent: Scalars['DateTime'];
+  dateSent: Scalars['String'];
   toId: Scalars['Int'];
 };
 
 
 export type MutationCreatePostArgs = {
-  datePublished: Scalars['DateTime'];
+  datePublished: Scalars['String'];
   userName: Scalars['String'];
   lastName: Scalars['String'];
   firstName: Scalars['String'];
@@ -180,7 +180,7 @@ export type MutationRetweetPostArgs = {
 
 
 export type MutationCommentOnPostArgs = {
-  datePublished: Scalars['DateTime'];
+  datePublished: Scalars['String'];
   comment: Scalars['String'];
   postId: Scalars['Int'];
 };
@@ -193,7 +193,7 @@ export type Post = {
   firstName: Scalars['String'];
   lastName: Scalars['String'];
   content: Scalars['String'];
-  datePublished: Scalars['DateTime'];
+  datePublished: Scalars['String'];
   points: Scalars['Float'];
   retweetsCount: Scalars['Float'];
   commentsCount: Scalars['Float'];
@@ -223,7 +223,7 @@ export type Query = {
   getSpecificUserInfo: Users;
   getCurrentUser?: Maybe<Users>;
   searchUsers: Array<Users>;
-  getAllUserMessages: Array<Message>;
+  getAllUserMessages: Array<AllUserMessages>;
   getAllMessagesFromUser: Array<Message>;
   getAllPosts: Array<Post>;
   getAllUserPosts: Array<Post>;
@@ -300,6 +300,23 @@ export type Users = {
   profile: Profile;
 };
 
+export type AllUserMessages = {
+  __typename?: 'allUserMessages';
+  id: Scalars['Int'];
+  content: Scalars['String'];
+  dateSent: Scalars['String'];
+  fromId: Scalars['Int'];
+  toId: Scalars['Int'];
+  sender_firstName: Scalars['String'];
+  sender_lastName: Scalars['String'];
+  sender_username: Scalars['String'];
+  receiver_firstName: Scalars['String'];
+  receiver_lastName: Scalars['String'];
+  receiver_username: Scalars['String'];
+  sender_avatar: Scalars['String'];
+  receiver_avatar: Scalars['String'];
+};
+
 export type PostSnippetFragment = (
   { __typename?: 'Post' }
   & Pick<Post, 'id' | 'userId' | 'firstName' | 'lastName' | 'content' | 'voteStatus' | 'datePublished' | 'userName' | 'points' | 'retweetsCount'>
@@ -338,7 +355,7 @@ export type ByeQuery = (
 export type CommentOnPostMutationVariables = Exact<{
   postId: Scalars['Int'];
   comment: Scalars['String'];
-  datePublished: Scalars['DateTime'];
+  datePublished: Scalars['String'];
 }>;
 
 
@@ -352,7 +369,7 @@ export type CreatePostMutationVariables = Exact<{
   firstName: Scalars['String'];
   lastName: Scalars['String'];
   userName: Scalars['String'];
-  datePublished: Scalars['DateTime'];
+  datePublished: Scalars['String'];
 }>;
 
 
@@ -501,23 +518,8 @@ export type GetAllUserMessagesQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetAllUserMessagesQuery = (
   { __typename?: 'Query' }
   & { getAllUserMessages: Array<(
-    { __typename?: 'Message' }
-    & Pick<Message, 'id' | 'content' | 'fromId' | 'toId'>
-    & { from: (
-      { __typename?: 'Users' }
-      & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username'>
-      & { profile: (
-        { __typename?: 'Profile' }
-        & Pick<Profile, 'avatar'>
-      ) }
-    ), to: (
-      { __typename?: 'Users' }
-      & Pick<Users, 'id' | 'firstName' | 'lastName' | 'username'>
-      & { profile: (
-        { __typename?: 'Profile' }
-        & Pick<Profile, 'avatar'>
-      ) }
-    ) }
+    { __typename?: 'allUserMessages' }
+    & Pick<AllUserMessages, 'id' | 'content' | 'dateSent' | 'fromId' | 'toId' | 'sender_firstName' | 'sender_lastName' | 'sender_username' | 'receiver_firstName' | 'receiver_lastName' | 'receiver_username' | 'sender_avatar' | 'receiver_avatar'>
   )> }
 );
 
@@ -797,7 +799,7 @@ export type SearchUsersQuery = (
 
 export type SendMessageMutationVariables = Exact<{
   toId: Scalars['Int'];
-  dateSent: Scalars['DateTime'];
+  dateSent: Scalars['String'];
   content: Scalars['String'];
 }>;
 
@@ -916,7 +918,7 @@ export type ByeQueryHookResult = ReturnType<typeof useByeQuery>;
 export type ByeLazyQueryHookResult = ReturnType<typeof useByeLazyQuery>;
 export type ByeQueryResult = Apollo.QueryResult<ByeQuery, ByeQueryVariables>;
 export const CommentOnPostDocument = gql`
-    mutation CommentOnPost($postId: Int!, $comment: String!, $datePublished: DateTime!) {
+    mutation CommentOnPost($postId: Int!, $comment: String!, $datePublished: String!) {
   commentOnPost(postId: $postId, comment: $comment, datePublished: $datePublished)
 }
     `;
@@ -949,7 +951,7 @@ export type CommentOnPostMutationHookResult = ReturnType<typeof useCommentOnPost
 export type CommentOnPostMutationResult = Apollo.MutationResult<CommentOnPostMutation>;
 export type CommentOnPostMutationOptions = Apollo.BaseMutationOptions<CommentOnPostMutation, CommentOnPostMutationVariables>;
 export const CreatePostDocument = gql`
-    mutation CreatePost($content: String!, $firstName: String!, $lastName: String!, $userName: String!, $datePublished: DateTime!) {
+    mutation CreatePost($content: String!, $firstName: String!, $lastName: String!, $userName: String!, $datePublished: String!) {
   createPost(
     content: $content
     firstName: $firstName
@@ -1291,26 +1293,17 @@ export const GetAllUserMessagesDocument = gql`
   getAllUserMessages {
     id
     content
+    dateSent
     fromId
-    from {
-      id
-      firstName
-      lastName
-      username
-      profile {
-        avatar
-      }
-    }
     toId
-    to {
-      id
-      firstName
-      lastName
-      username
-      profile {
-        avatar
-      }
-    }
+    sender_firstName
+    sender_lastName
+    sender_username
+    receiver_firstName
+    receiver_lastName
+    receiver_username
+    sender_avatar
+    receiver_avatar
   }
 }
     `;
@@ -2018,7 +2011,7 @@ export type SearchUsersQueryHookResult = ReturnType<typeof useSearchUsersQuery>;
 export type SearchUsersLazyQueryHookResult = ReturnType<typeof useSearchUsersLazyQuery>;
 export type SearchUsersQueryResult = Apollo.QueryResult<SearchUsersQuery, SearchUsersQueryVariables>;
 export const SendMessageDocument = gql`
-    mutation SendMessage($toId: Int!, $dateSent: DateTime!, $content: String!) {
+    mutation SendMessage($toId: Int!, $dateSent: String!, $content: String!) {
   sendMessage(toId: $toId, dateSent: $dateSent, content: $content) {
     id
     fromId

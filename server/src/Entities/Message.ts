@@ -1,6 +1,5 @@
 import { Entity, BaseEntity, ManyToOne, PrimaryColumn, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Users } from "./Users";
-import { Post } from "./Post";
 import { Field, Int, ObjectType } from "type-graphql";
 
 // m to m
@@ -20,9 +19,9 @@ export class Message extends BaseEntity {
   @Column()
   content!: string;
 
-  @Field(() => Date)
+  @Field(() => String)
   @Column()
-  dateSent!: Date;
+  dateSent!: string;
 
   @Field(() => Int)
   @PrimaryColumn()

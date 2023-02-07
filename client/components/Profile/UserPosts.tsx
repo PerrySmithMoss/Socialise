@@ -127,14 +127,6 @@ export const UserPosts: React.FC = () => {
                 >
                   Delete post <DeleteIcon />
                 </MenuItem>
-                <Divider></Divider>
-                <MenuItem onClick={handleClose}>
-                  Pin to your timeline <PersonPinCircleIcon />
-                </MenuItem>
-                <Divider></Divider>
-                <MenuItem onClick={handleClose}>
-                  Add/remove from your list <ListIcon />
-                </MenuItem>
               </Menu>
             </ListItem>
           </Link>
@@ -193,15 +185,6 @@ export const UserPosts: React.FC = () => {
                 >
                   Delete post <DeleteIcon />
                 </MenuItem>
-                <Divider></Divider>
-                <MenuItem onClick={handleClose}>
-                  Pin to your timeline <PersonPinCircleIcon />
-                </MenuItem>
-                <Divider></Divider>
-                <MenuItem onClick={handleClose}>
-                  Add/remove from your list <ListIcon />
-                </MenuItem>
-              </Menu>
             </Box>
           </Box>
           <Divider variant="inset" component="li" />
