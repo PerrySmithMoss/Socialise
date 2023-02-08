@@ -119,6 +119,7 @@ const main = async () => {
         console.log("❌  Client disconnected from subscriptions"),
     },
     uploads: false,
+    introspection: true
   });
 
   apolloServer.applyMiddleware({ app, cors: false });
