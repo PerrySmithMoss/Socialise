@@ -26,12 +26,15 @@ import { RetweetPost } from "./Entities/RetweetPost";
 const app: Application = express();
 const httpServer = http.createServer(app);
 
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  optionsSuccessStatus: 200,
+  credentials: true,
+};
+
 const main = async () => {
   app.use(
-    cors({
-      origin: process.env.CLIENT_URL,
-      credentials: true,
-    })
+    cors(corsOptions)
   );
   app.use(cookieParser());
   app.use(express.static("public"));
@@ -119,10 +122,12 @@ const main = async () => {
         console.log("❌  Client disconnected from subscriptions"),
     },
     uploads: false,
-    introspection: true
+    introspection: true,
   });
 
-  apolloServer.applyMiddleware({ app, cors: false });
+  await apolloServer.start()
+
+  apolloServer.applyMiddleware({ app, cors: corsOptions });
   apolloServer.installSubscriptionHandlers(httpServer);
 
   httpServer.listen(5000, () => {
