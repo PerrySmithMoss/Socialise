@@ -19,12 +19,12 @@ import { LikedPost } from "./Entities/LikedPost";
 import { Comment } from "./Entities/Comment";
 import { Message } from "./Entities/Message";
 
-import http from "http";
+import https from "https";
 import { Following } from "./Entities/Following";
 import { RetweetPost } from "./Entities/RetweetPost";
 
 const app: Application = express();
-const httpServer = http.createServer(app);
+const httpServer = https.createServer(app);
 
 const corsOptions = {
   origin: process.env.CLIENT_URL,
@@ -130,7 +130,7 @@ const main = async () => {
   apolloServer.applyMiddleware({ app, cors: corsOptions });
   apolloServer.installSubscriptionHandlers(httpServer);
 
-  httpServer.listen(5000, () => {
+  httpServer.listen(process.env.PORT, () => {
     console.log(`🚀 Server running on ${process.env.SERVER_URL}`);
     console.log(
       `🚀  Subscriptions ready at ws://${process.env.SERVER_DOMAIN}:${apolloServer.subscriptionsPath}`
