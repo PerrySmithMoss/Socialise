@@ -19,12 +19,13 @@ import { LikedPost } from "./Entities/LikedPost";
 import { Comment } from "./Entities/Comment";
 import { Message } from "./Entities/Message";
 
-import https from "https";
+import http from "http";
 import { Following } from "./Entities/Following";
 import { RetweetPost } from "./Entities/RetweetPost";
 
 const app: Application = express();
-const httpServer = https.createServer(app);
+const httpServer = http.createServer(app);
+const PORT = process.env.PORT || 5000
 
 const corsOptions = {
   origin: process.env.CLIENT_URL,
@@ -43,7 +44,6 @@ const main = async () => {
   // Might need next line in prod
   // app.set("trust proxy", 1)
   
-
   await createConnection({
     type: "postgres",
     host: `${process.env.DB_HOST}`,
@@ -117,9 +117,11 @@ const main = async () => {
     context: ({ req, res }) => ({ req, res }),
     subscriptions: {
       path: "/subscriptions",
-      onConnect: () => console.log("✅  Client connected for subscriptions"),
-      onDisconnect: () =>
-        console.log("❌  Client disconnected from subscriptions"),
+      onConnect: () => {
+        console.log("✅  Client connected for subscriptions")
+      },
+      // onDisconnect: () =>
+      //   console.log("❌  Client disconnected from subscriptions"),
     },
     uploads: false,
     introspection: true,
@@ -130,7 +132,7 @@ const main = async () => {
   apolloServer.applyMiddleware({ app, cors: corsOptions });
   apolloServer.installSubscriptionHandlers(httpServer);
 
-  httpServer.listen(process.env.PORT, () => {
+  httpServer.listen(PORT, () => {
     console.log(`🚀 Server running on ${process.env.SERVER_URL}`);
     console.log(
       `🚀  Subscriptions ready at ws://${process.env.SERVER_DOMAIN}:${apolloServer.subscriptionsPath}`
