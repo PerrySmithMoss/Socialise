@@ -161,7 +161,7 @@ export class MessageResolver {
     @Arg("toId", () => Int) toId: number,
     @Arg("dateSent", () => String) dateSent: string,
     @Arg("content", () => String) content: string,
-    @PubSub() pubsub: PubSubEngine,
+    // @PubSub() pubsub: PubSubEngine,
     @Ctx() context: MyContext
   ) {
     const authorization = context.req.headers["authorization"];
@@ -188,7 +188,7 @@ export class MessageResolver {
       }).save();
 
       // console.log(sentMessage)
-      pubsub.publish("NEW_MESSAGE", sentMessage);
+      // pubsub.publish("NEW_MESSAGE", sentMessage);
 
       return sentMessage;
     } catch (err) {
@@ -197,11 +197,11 @@ export class MessageResolver {
     // return true;
   }
 
-  @Subscription({
-    topics: "NEW_MESSAGE",
-    // filter: ({payload, args}) => payload.toId === args.toId ? true : false
-  })
-  newMessage(@Root() sentMessage: Message): Message {
-    return sentMessage;
-  }
+  // @Subscription({
+  //   topics: "NEW_MESSAGE",
+  //   // filter: ({payload, args}) => payload.toId === args.toId ? true : false
+  // })
+  // newMessage(@Root() sentMessage: Message): Message {
+  //   return sentMessage;
+  // }
 }

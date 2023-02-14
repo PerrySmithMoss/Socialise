@@ -115,14 +115,12 @@ const main = async () => {
       resolvers: [UserResolver, PostResolver, MessageResolver],
     }),
     context: ({ req, res }) => ({ req, res }),
-    subscriptions: {
-      path: "/subscriptions",
-      onConnect: () => {
-        console.log("✅  Client connected for subscriptions")
-      },
-      // onDisconnect: () =>
-      //   console.log("❌  Client disconnected from subscriptions"),
-    },
+    // subscriptions: {
+    //   path: "/subscriptions",
+    //   onConnect: () => {
+    //     console.log("✅  Client connected for subscriptions")
+    //   },
+    // },
     uploads: false,
     introspection: true,
   });
@@ -130,13 +128,13 @@ const main = async () => {
   await apolloServer.start()
 
   apolloServer.applyMiddleware({ app, cors: corsOptions });
-  apolloServer.installSubscriptionHandlers(httpServer);
+  // apolloServer.installSubscriptionHandlers(httpServer);
 
   httpServer.listen(PORT, () => {
     console.log(`🚀 Server running on ${process.env.SERVER_URL}`);
-    console.log(
-      `🚀  Subscriptions ready at ws://${process.env.SERVER_DOMAIN}:${apolloServer.subscriptionsPath}`
-    );
+    // console.log(
+    //   `🚀  Subscriptions ready at ws://${process.env.SERVER_DOMAIN}:${apolloServer.subscriptionsPath}`
+    // );
   });
 };
 

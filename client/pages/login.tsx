@@ -17,6 +17,7 @@ import Navbar from "../components/Navbar";
 import {
   GetCurrentUserDocument,
   GetCurrentUserQuery,
+  useGetCurrentUserLazyQuery,
   useLoginMutation,
 } from "../graphql/generated/graphql";
 
@@ -43,29 +44,24 @@ const Login: NextPage = () => {
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [loginUser] = useLoginMutation();
+  const [fetchCurrentUser] = useGetCurrentUserLazyQuery({
+    fetchPolicy: "network-only",
+  });
   const router = useRouter();
 
   const handleLoginUser = async () => {
     const res = await loginUser({
       variables: {
         email,
-        password
+        password,
       },
-      update: (store, { data }) => {
-        if (!data) {
-          return null;
-        }
-
-        store.writeQuery({
-          query: GetCurrentUserDocument,
-          data: {
-            getCurrentUser: data.loginUser.data?.user
-          }
-        });
-      }
     });
+    
     if (res && res.data?.loginUser.data) {
       setAccessKey(res.data.loginUser.data?.accessToken);
+
+      fetchCurrentUser();
+
       router.push("/");
     }
 

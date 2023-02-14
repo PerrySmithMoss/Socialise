@@ -228,23 +228,23 @@ function createApolloClient(initialState = {}, serverAccessToken?: string) {
     console.log("networkError: ", networkError);
   });
 
-  const wsLink =
-    typeof window !== "undefined"
-      ? new WebSocketLink({
-          uri: `ws://${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/subscriptions`,
-          options: {
-            reconnect: true,
-            connectionParams: {
-              authorization:
-                typeof window !== "undefined"
-                  ? localStorage.getItem("habit")
-                  : typeof window !== "undefined"
-                  ? `Bearer ${localStorage.getItem("habit")}`
-                  : "",
-            },
-          },
-        })
-      : null;
+  // const wsLink =
+  //   typeof window !== "undefined"
+  //     ? new WebSocketLink({
+  //         uri: `ws://${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/subscriptions`,
+  //         options: {
+  //           reconnect: true,
+  //           connectionParams: {
+  //             authorization:
+  //               typeof window !== "undefined"
+  //                 ? localStorage.getItem("habit")
+  //                 : typeof window !== "undefined"
+  //                 ? `Bearer ${localStorage.getItem("habit")}`
+  //                 : "",
+  //           },
+  //         },
+  //       })
+  //     : null;
 
   const httpLink = new HttpLink({
     uri: `${process.env.NEXT_PUBLIC_SERVER_URL}/graphql`,
@@ -269,14 +269,14 @@ function createApolloClient(initialState = {}, serverAccessToken?: string) {
               definition.operation === "subscription"
             );
           },
-          wsLink as WebSocketLink,
+          // wsLink as WebSocketLink,
           uploadLink
         )
       : httpLink;
 
   return new ApolloClient({
     ssrMode: typeof window === "undefined", // Disables forceFetch on the server (so queries are only run once)
-    link: splitLink as any,
+    link: authLink.concat(refreshLink).concat(httpLink as any),
     cache: new InMemoryCache().restore(initialState),
   });
 }
