@@ -170,41 +170,41 @@ export class UserResolver {
     }
   }
 
-  // @Mutation(() => ImageUploadResponse)
-  // async uploadUserImage(
-  //   @Arg("userId", () => Int) userId: number,
-  //   @Arg("file", () => GraphQLUpload) file: FileUpload
-  // ) {
-  //   try {
-  //     const { createReadStream, filename } = file;
+  @Mutation(() => ImageUploadResponse)
+  async uploadUserImage(
+    @Arg("userId", () => Int) userId: number,
+    @Arg("file", () => GraphQLUpload) file: FileUpload
+  ) {
+    try {
+      const { createReadStream, filename } = file;
 
-  //     const { ext } = path.parse(filename);
-  //     const randomString = crypto.randomBytes(20).toString("hex") + ext;
+      const { ext } = path.parse(filename);
+      const randomString = crypto.randomBytes(20).toString("hex") + ext;
 
-  //     const stream = createReadStream();
+      const stream = createReadStream();
 
-  //     const pathNameForServer = path.join(
-  //       __dirname,
-  //       `../../../public/images/${randomString}`
-  //     );
-  //     const pathNameForClient = `${process.env.SERVER_URL}/images/${randomString}`;
-  //     stream.pipe(fs.createWriteStream(pathNameForServer));
+      const pathNameForServer = path.join(
+        __dirname,
+        `../../../public/images/${randomString}`
+      );
+      const pathNameForClient = `${process.env.SERVER_URL}/images/${randomString}`;
+      stream.pipe(fs.createWriteStream(pathNameForServer));
 
-  //     const user = await Users.findOneOrFail(userId, {
-  //       relations: ["profile"],
-  //     });
+      const user = await Users.findOneOrFail(userId, {
+        relations: ["profile"],
+      });
 
-  //     await Profile.update(user.profileId, { avatar: pathNameForClient });
+      await Profile.update(user.profileId, { avatar: pathNameForClient });
 
-  //     return {
-  //       url: `${process.env.SERVER_URL}/images/${filename}`,
-  //     };
-  //   } catch (err) {
-  //     return {
-  //       url: err,
-  //     };
-  //   }
-  // }
+      return {
+        url: `${process.env.SERVER_URL}/images/${filename}`,
+      };
+    } catch (err) {
+      return {
+        url: err,
+      };
+    }
+  }
 
   @Mutation(() => Boolean)
   async logUserOut(@Ctx() { res }: MyContext) {

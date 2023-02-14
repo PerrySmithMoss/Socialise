@@ -197,11 +197,11 @@ export class MessageResolver {
     // return true;
   }
 
-  // @Subscription({
-  //   topics: "NEW_MESSAGE",
-  //   // filter: ({payload, args}) => payload.toId === args.toId ? true : false
-  // })
-  // newMessage(@Root() sentMessage: Message): Message {
-  //   return sentMessage;
-  // }
+  @Subscription({
+    topics: "NEW_MESSAGE",
+    // filter: ({payload, args}) => payload.toId === args.toId ? true : false
+  })
+  newMessage(@Root() sentMessage: Message): Message {
+    return sentMessage;
+  }
 }
