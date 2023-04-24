@@ -43,7 +43,7 @@ export class PostResolver {
     const authorization = context.req.headers["authorization"];
 
     if (!authorization) {
-      console.log("You're not authorized");
+      // console.log("You're not authorized");
       return null;
     }
 
